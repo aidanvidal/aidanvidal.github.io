@@ -10,6 +10,24 @@
 		
 		// Hide the "View All" button
 		document.getElementById("viewall").style.display = "none";
+		// Show the "View Less" button
+		document.getElementById("viewless").style.display = "inline-block";
+	});
+
+	// View Less button
+	document.getElementById("viewless").addEventListener("click", function() {
+		// Toggle visibility of all articles
+		var articles = document.querySelectorAll(".features article");
+		articles.forEach(function(article, index) {
+			if (index > 2) {
+				article.style.display = "none";
+			}
+		});
+		
+		// Hide the "View Less" button
+		document.getElementById("viewless").style.display = "none";
+		// Show the "View All" button
+		document.getElementById("viewall").style.display = "inline-block";
 	});
 		
 	/**
