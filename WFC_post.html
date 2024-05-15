@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Your Blog Title - {{ Post Title }}</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>I got reprogrammed by a rogue AI<br />
+            and now I'm totally cray</p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#two">Understanding the Basics</a></li>
+                <li><a href="#three">Implementing WFC with Pygame</a></li>
+                <li><a href="#four">Experimentation and Exploration</a></li>
+                <li><a href="#five">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Unraveling the Mysteries of Wave Function Collapse with Pygame</h2>
+                <p>Exploring various algorithms and techniques in programming and game development can be both educational and immensely captivating. 
+                    One intriguing concept that cought my interest is Wave Function Collapse (WFC), an algorithm used in procedural generation and game development to generate worlds and environments.
+                <p>In this blog post, I'll talk about what WFC is and implement the WFC algorithm using Pygame, a popular Python library for creating games and multimedia applications. 
+                    By the end of this post, you'll have a basic understanding of how WFC works and how I've implemented in Pygame. 
+                </p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Understanding the Basics</h4>
+                <p>At its core, the Wave Function Collapse algorithm operates on the principle of "wave-like" propagation of information. It starts with a grid of cells, each representing a possible state or configuration. 
+                    These cells interact with their neighbors according to predefined rules, gradually collapsing into a final, coherent pattern. 
+                    Take sodoku as an example, where each cell's value is constrained by its neighboring cells. Each cell starts with a superposition of possible values and collapses into a single value based on these constraints.
+                    Each cell has entropy, which is the number of possible states it can be in. The algorithm tries to minimize the entropy of each cell by collapsing it to a single state based on the constraints imposed by its neighbors.
+                    It finds the cell with the lowest entropy and collapses it to a single state, propagating this change to its neighbors and updating their entropies. This process continues until all cells reach a stable state.
+                    You can read more about the algorithm <a href="https://en.wikipedia.org/wiki/Wave_function_collapse" target="_blank">here</a>.
+                </p>
+                <p>In our implementation, we represent each cell as a square tile with various directional possibilities: up, down, left, and right. 
+                    The algorithm iteratively collapses the superposition of possible states into definite configurations based on neighboring constraints until all cells reach a stable state.
+                </p>
+                <p>Here are the rules for my tile set. The tiles in each direction section refer to what tile is able to place there.
+                    For example, if the tile is facing up and the tile we are trying to place is above it, we can only place a tile that is facing down, left, or right.
+                </p>
+                <pre><code class="language-py line-numbers" style="font-size: small;"># rules for the tiles
+rules = {
+    "up": {
+        BLANK: [BLANK, UP],
+        DOWN: [UP, BLANK],
+        LEFT: [DOWN, LEFT, RIGHT],
+        RIGHT: [DOWN, LEFT, RIGHT],
+        UP: [DOWN, LEFT, RIGHT]
+    },
+    "down": {
+        BLANK: [BLANK, DOWN],
+        UP: [DOWN, BLANK],
+        LEFT: [UP, LEFT, RIGHT],
+        RIGHT: [UP, LEFT, RIGHT],
+        DOWN: [UP, LEFT, RIGHT]
+    },
+    "left": {
+        BLANK: [BLANK, LEFT],
+        RIGHT: [LEFT, BLANK],
+        UP: [UP, DOWN, RIGHT],
+        DOWN: [UP, DOWN, RIGHT],
+        LEFT: [UP, DOWN, RIGHT]
+    },
+    "right": {
+        BLANK: [BLANK, RIGHT],
+        LEFT: [RIGHT, BLANK],
+        UP: [UP, DOWN, LEFT],
+        DOWN: [UP, DOWN, LEFT],
+        RIGHT: [UP, DOWN, LEFT]
+    }
+}</code></pre>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>Implementing WFC with Pygame</h4>
+                <p>Let's delve into the code to see how Wave Function Collapse is implemented using Pygame. The code consists of several components:</p>
+                <ul>
+                    <li><strong>Initialization:</strong> Setting up the Pygame environment, loading tile images, and initializing cell structures.</li>
+                    <li><strong>Collapse Function:</strong> Randomly collapsing a cell based on available directions and updating its state.</li>
+                    <li><strong>Update Directions:</strong> Updating possible directions for each cell based on neighboring constraints.</li>
+                    <li><strong>Main Loop:</strong> Iterating through the process of collapsing cells and updating the display until all cells are in a stable state.</li>
+                </ul>
+                <p>Once all that is completed, the final result should look something like this</p>
+                <img src="gifs/WFC_gif.gif">
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Experimentation and Exploration</h4>
+                <p>Now comes the fun part! Once you understand the basics of the algorithm and how it's implemented, you can start experimenting and exploring its capabilities.
+                    Here are a few ideas to get you started:
+                </p>
+                <ol>
+                    <li><strong>Custom Tilesets:</strong> Replace the default tileset with your own custom tiles to create unique patterns and visuals.</li>
+                    <li><strong>Rule Modifications:</strong> Tweak the rules governing cell interactions to observe different emergent behaviors and patterns.</li>
+                    <li><strong>Interactive Elements:</strong> Add interactivity to the simulation by allowing users to modify cells or observe the algorithm in real-time.</li>
+                </ol>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>Conclusion</h4>
+                <p>Wave Function Collapse is a powerful algorithm with diverse applications in procedural generation, game design, and beyond. 
+                    I enjoyed exploring the inner workings of WFC and implementing it using Pygame, and I hope this post has inspired you to do the same.
+                </p>
+                <p>This project was inspired by The Coding Train's video on WFC, which you can watch <a href="https://www.youtube.com/watch?v=rI_y2GAlQFM" target="_blank">here</a>.
+                </p>
+                <p>Thank you for reading, and happy coding! The entire code for this project can be found <a href="https://github.com/aidanvidal/Fun-Projects/tree/main/WaveFunctionCollapse" target="_blank">here</a>.</p>
+                </section>
+                <section id="six">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: May 15, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
