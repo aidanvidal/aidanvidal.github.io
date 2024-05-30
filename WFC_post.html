@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Your Blog Title - {{ Post Title }}</title>
+  <title>Unraveling the Mysteries of Wave Function Collapse with Pygame</title>
   <link rel="stylesheet" href="assets/css/main.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+  <link rel="stylesheet" href="prism.css">
 </head>
 
 <body class="is-preload">
@@ -15,12 +14,13 @@
         <header>
             <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
             <h1 id="logo">Aidan Vidal</h1>
-            <p>I got reprogrammed by a rogue AI<br />
-            and now I'm totally cray</p>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
         </header>
         <nav id="nav">
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="#two">Understanding the Basics</a></li>
                 <li><a href="#three">Implementing WFC with Pygame</a></li>
                 <li><a href="#four">Experimentation and Exploration</a></li>
@@ -67,7 +67,8 @@
                 <p>Here are the rules for my tile set. The tiles in each direction section refer to what tile is able to place there.
                     For example, if the tile is facing up and the tile we are trying to place is above it, we can only place a tile that is facing down, left, or right.
                 </p>
-                <pre><code class="language-py line-numbers" style="font-size: small;"># rules for the tiles
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-coldark-dark.min.css" rel="stylesheet" />
+                <pre><code class="language-python" style="font-size: small;"># rules for the tiles
 rules = {
     "up": {
         BLANK: [BLANK, UP],
@@ -148,7 +149,7 @@ rules = {
         <section id="footer">
             <div class="container">
                 <ul class="copyright">
-                    <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
                 </ul>
             </div>
         </section>
@@ -161,5 +162,6 @@ rules = {
     <script src="assets/js/breakpoints.min.js"></script>
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
 </body>
 </html>
