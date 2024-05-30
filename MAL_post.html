@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Building a Web App for Anime Enthusiasts</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Development Challenges and Solutions</a></li>
+                <li><a href="#three">Features</a></li>
+                <li><a href="#four">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Building a Web App for Anime Enthusiasts</h2>
+                <p>As someone who likes watching anime and coding, I recently embarked on an exciting journey to create a project that combines the two. There is a website called <a href="https://myanimelist.net/" target="_blank">MyAnimeList</a> (MAL) which holds a database of all the anime ever made and allows you to create your own list and rank them. 
+                    I have decided to use their API along with openAI's API to create an assisant which will help you easily navigate the site's API using natural language. This web application aims to streamline the way users manage their anime and manga lists on MAL. Here, I will share my experiences, challenges, and insights from developing this project.
+                </p>
+                <p>The MAL Project is a Django-based web application that allows users to search for anime and manga, add them to personal lists, and track their progress. It offers a user-friendly interface with functionalities like user registration, authentication, and detailed information views about each anime or manga.
+                </p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Development Challenges and Solutions</h4>
+                <h5>User Registration and Authentication</h5>
+                <p>One of the first hurdles was implementing a secure and efficient user registration and authentication system. 
+                    Using Django's built-in authentication framework was a lifesaver, but integrating it seamlessly required some work. Here's a snippet from my views.py for user creation:
+                </p>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-coldark-dark.min.css" rel="stylesheet" />
+                <pre><code class="language-python" style="font-size: small;">def create(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect('/home/')
+    
+    if request.method == "POST":
+        username = request.POST["username"]
+        user = User.objects.filter(username=username)
+        if user.exists():
+            return render(request, 'MAL_app/create.html', {'error_message': 'Username already exists. Please try again.'})
+        password = request.POST["password"]
+        email = request.POST["email"]
+        
+        user = User.objects.create_user(username, email, password)
+        UserProfile.objects.create(user=user, refresh_token='', access_token='')
+        login(request, user)
+        
+        return HttpResponseRedirect('/token/')
+    return render(request, 'MAL_app/create.html')</code></pre>
+                <p>This code handles user creation, checks for existing usernames, and manages user sessions. One challenge was ensuring the form data was correctly validated and errors were gracefully handled.
+                </p>
+
+                <h5>Search Functionality and Personal Lists</h5>
+                <p>Creating a responsive and efficient search functionality was crucial for the app. 
+                    The search feature allows users to find anime and manga and add them to their personal lists. 
+                    Handling user input and processing it required careful consideration of security and efficiency:
+                </p>
+                <pre><code class="language-python" style="font-size: small;">def process_input(request):
+    if request.method == 'POST' and 'input_text' in request.POST:
+        print(request.POST['input_text'])
+        if request.user.is_authenticated:
+            token = UserProfile.objects.get(user=request.user).access_token
+            output_text = helper.process_message(request.POST['input_text'], token=token)
+        else:
+            output_text = helper.process_message(request.POST['input_text'])
+        return JsonResponse({'output_text': output_text})
+    else:
+        return JsonResponse({'error': 'Invalid request'})</code></pre>
+                <p>Here, handling the user's input and providing real-time feedback was a significant challenge. 
+                    Ensuring the search was both fast and accurate required optimizing queries and effectively managing tokens for authenticated users.
+                </p>
+                <h5>Token Management</h5>
+                <p>Managing tokens securely for API interactions was another critical aspect. 
+                    Generating and verifying tokens involved running subprocesses and handling sensitive information:
+                </p>
+                <pre><code class="language-python" style="font-size: small;">def generate_token_link(request):
+    if request.method == 'POST':
+        client_id = request.POST.get('clientId')
+        code_verifier = subprocess.check_output(['python', 'MAL_app/MAL_Helper/code_verifier.py']).decode('utf-8')
+        
+        output = subprocess.check_output(['python', 'MAL_app/MAL_Helper/link_generator.py', client_id, code_verifier]).decode('utf-8')
+        
+        return JsonResponse({'output_link': output, 'code_verification': code_verifier})
+    else:
+        return JsonResponse({'error': 'Invalid request'})</code></pre>
+                    <p>This snippet highlights the complexity of managing OAuth tokens and ensuring secure interactions with external APIs.
+                    </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>Features</h4>
+                <p>Here's a quick rundown of the features I've implemented::</p>
+                <ul>
+                    <li><strong>User Registration and Authentication:</strong> Securely register and log in users.</li>
+                    <li><strong>Search Functionality:</strong> Easily find anime and manga.</li>
+                    <li><strong>Personal Lists:</strong> Add titles to personalized lists.</li>
+                    <li><strong>Progress Tracking:</strong> Mark episodes or chapters as watched or read.</li>
+                    <li><strong>Detailed Information Views:</strong> Get comprehensive details about each title.</li>
+                </ul>
+                <p>These features provide a seamless and intuitive user experience, making it easy for anime enthusiasts to manage their lists and explore new titles.
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Conclusion</h4>
+                <p>Developing the MAL Project was a rewarding experience that honed my skills in Django and web development. 
+                    The process was filled with challenges, from user authentication to API management, each providing valuable lessons. 
+                    This project not only reinforced my coding skills but also taught me the importance of security and efficiency in web applications.
+                </p>
+                <p>I have not published this website as it is a dynmaic website and requries it to be hosted on a paid server</p>
+                <p>Thank you for reading, and happy coding! The entire code for this project can be found <a href="https://github.com/aidanvidal/MAL-Bot" target="_blank">here</a>.</p>
+                </section>
+                <section id="five">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: May 30, 2024</p>
+                </section>
+                    <hr />
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
