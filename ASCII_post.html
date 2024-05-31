@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Building a Web App for Anime Enthusiasts</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Understanding the Basics</a></li>
+                <li><a href="#three">Key Learnings</a></li>
+                <li><a href="#four">Implementing the ASCII Art Converter</a></li>
+                <li><a href="#five">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Transforming Images into ASCII Art with Python</h2>
+                <p>Exploring various programming techniques can be both educational and immensely captivating. 
+                    One intriguing project that caught my interest is converting images into ASCII art, a creative way to represent images using characters. 
+                    This project utilizes Python, OpenCV, and Pygame to achieve this transformation.                    
+                </p>
+                <p>In this blog post, I'll walk you through the development of an Image to ASCII Art converter, explaining how the code works and sharing what I learned along the way. 
+                    By the end, you'll understand the basics of image processing and ASCII art creation, and how to implement it using Python.
+                </p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Understanding the Basics</h4>
+                <p>At its core, converting an image to ASCII art involves mapping pixel brightness to characters that visually represent different levels of intensity. 
+                    ASCII art uses characters like @, #, and $ to create a picture, with each character representing a different shade of gray. 
+                    The process includes reading an image, converting it to grayscale, and then mapping these grayscale values to ASCII characters.
+                </p>
+                <p>In our implementation, the image is first resized and converted to grayscale. 
+                    Then, each pixel's brightness is mapped to a corresponding ASCII character based on a predefined density scale.
+                </p>
+                <p>The ASCII character brightness scale I used is this:
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-coldark-dark.min.css" rel="stylesheet" />
+                <pre><code class="language-python">DENSITY = '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1[]{}?-_+~<>i!lI;:,"^`\'. '</code></pre>
+                    But you could use any scale you like, depending on the characters you want to use.
+                </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>Key Learnings</h4>
+                <p>Here's a quick rundown of the features I've implemented::</p>
+                <ul>
+                    <li><strong>Image Processing with OpenCV:</strong> This project deepened my understanding of image processing techniques, including reading, resizing, and converting images to grayscale.</li>
+                    <li><strong>Brightness Mapping:</strong> Mapping pixel brightness to ASCII characters taught me about handling image data and the concept of density mapping.</li>
+                    <li><strong>Using Pygame:</strong> Implementing Pygame for rendering ASCII art in a window was a great way to learn about graphical display and event handling in Python.</li>
+                    <li><strong>Color Handling:</strong> Integrating color into the ASCII art added complexity and provided insights into color channel manipulation.</li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Implementing the ASCII Art Converter</h4>
+                <p>Let's delve into the code to see how the Image to ASCII Art converter is implemented using Python. 
+                    The code consists of several components:
+                </p>
+                <h5>Constants</h5>
+                <pre><code class="language-python">DENSITY = '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1[]{}?-_+~<>i!lI;:,"^`\'. '
+IMAGE = './ImageToASCII/test.jpg'
+FONT_SIZE = 5
+WIDTH = 200
+HEIGHT = 200</code></pre>
+                <ul>
+                    <li><strong>DENSITY:</strong> The ASCII character scale used for mapping pixel brightness.</li>
+                    <li><strong>IMAGE:</strong> The path to the input image.</li>
+                    <li><strong>FONT_SIZE:</strong> The size of the font used for rendering the ASCII art.</li>
+                    <li><strong>WIDTH and HEIGHT:</strong> The dimensions to which the image is resized.</li>
+                </ul>
+                <h5>Image Processing Functions</h5>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-coldark-dark.min.css" rel="stylesheet" />
+                <pre><code class="language-python">def get_image():
+    image = cv2.imread(IMAGE, cv2.IMREAD_COLOR)
+    image = cv2.resize(image, (WIDTH, HEIGHT))
+    return image
+
+def get_brightness(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return gray</code></pre>
+                <ul>
+                    <li><strong>get_image()</strong> Reads the image and resizes it to the specified width and height.</li>
+                    <li><strong>get_brightness()</strong> Converts the image to grayscale for brightness mapping.</li>
+                </ul>
+                <h5>Density Mapping</h5>
+                <pre><code class="language-python">def map_density(brightness):
+    density = ''
+    for i in range(WIDTH):
+        for j in range(HEIGHT):
+            density += DENSITY[int(brightness[i][j] / 255 * len(DENSITY)) - 1]
+        density += '\n'
+    return density</code></pre>
+                <ul>
+                    <li><strong>map_density()</strong> Maps pixel brightness to ASCII characters based on the density scale.</li>
+                </ul>
+                <h5>Display</h5>
+                <pre><code class="language-python">def display_ascii(density):
+    window_width = WIDTH * FONT_SIZE
+    window_height = HEIGHT * FONT_SIZE
+    window = pygame.display.set_mode((window_width, window_height))
+    pygame.display.set_caption("ASCII Art")
+    font = pygame.font.SysFont("Arial", FONT_SIZE)
+
+    for i, row in enumerate(density.split('\n')):
+        for j, char in enumerate(row):
+            rendered_ascii = font.render(char, True, (255, 255, 255))
+            window.blit(rendered_ascii, (j * FONT_SIZE, i * FONT_SIZE))
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return</code></pre>
+                <ul>
+                    <li><strong>display_ascii()</strong> Renders the ASCII art in a Pygame window and handles display events.</li>
+                </ul>
+                <p>This code will display the input image in black & white ASCII art, but I have also implemented the option to use color.</p>
+                <p>Here's what the final result with color looks like:</p>
+                <img src="images/ascii_color.png" alt="ASCII Art with Color" style="max-width: 50%;" />
+                <p>I have also implemented it to work with video capture using OpenCV. Here's what that looks like:</p>
+                <img src="images/ascii_video.gif" alt="ASCII Art with Video Capture" style="max-width: 50%;" />
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>Conclusion</h4>
+                <p>Converting images to ASCII art is a fascinating blend of art and programming. 
+                    This project provided valuable insights into image processing, brightness mapping, and graphical display with Python. 
+                    I hope this post has inspired you to explore ASCII art creation and perhaps experiment with your own implementations.
+                </p>
+                <p>Thank you for reading, and happy coding! The entire code for this project can be found <a href="https://github.com/aidanvidal/Fun-Projects/tree/main/ImageToASCII" target="_blank">here</a>.</p>
+                </section>
+                <hr />
+                <!-- Six -->
+                <section id="six">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: May 31, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
