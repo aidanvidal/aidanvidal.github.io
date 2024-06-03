@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Building a Discord Chatbot with Voice Interaction</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Understanding the Basics</a></li>
+                <li><a href="#three">Key Learnings</a></li>
+                <li><a href="#four">Implementing the Discord Chatbot</a></li>
+                <li><a href="#five">Chatbot and TTS Functions</a></li>
+                <li><a href="#six">Experimentation and Exploration</a></li>
+                <li><a href="#seven">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Building a Discord Chatbot with Voice Interaction</h2>
+                <p>Exploring various algorithms and techniques in programming and bot development can be both educational and immensely captivating. 
+                    One intriguing project that caught my interest is creating a Discord chatbot with voice interaction capabilities. 
+                    This project utilizes Python, Discord.py, and several text-to-speech (TTS) and chatbot APIs to enhance user engagement on Discord.                    
+                </p>
+                <p>In this blog post, I'll discuss how to build a Discord bot that joins voice channels, responds to text queries using AI chatbots, and converts those responses to speech. 
+                    By the end of this post, you'll understand the basics of setting up a Discord bot with voice interaction, and how I've implemented it using Python
+                </p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Understanding the Basics</h4>
+                <p>This project combines multiple APIs and libraries to create an interactive chatbot experience on Discord. 
+                    The bot can join voice channels, interact with users through text and voice, and utilize different TTS services to convert text responses into speech.
+                </p>
+                <p>The bot uses the OpenAI GPT-3.5 model for generating responses to user queries. 
+                    The responses are then converted to speech using Google's TTS service. The bot connects to voice channels, allowing it to speak the responses directly to users in the channel.
+                </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>Key Learnings</h4>
+                <ul>
+                    <li><strong>Discord.py:</strong> Gained experience in setting up and managing a Discord bot, handling events, and interacting with Discord's API.</li>
+                    <li><strong>Text-to-Speech Integration:</strong> Learned how to integrate various TTS services to convert text responses into speech.</li>
+                    <li><strong>Chatbot APIs:</strong> Explored different chatbot APIs and how to integrate them into the bot for generating conversational responses.</li>
+                    <li><strong>Voice Channel Interaction:</strong> Understood the complexities of managing voice connections and playing audio in Discord voice channels.</li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Implementing the Discord Chatbot</h4>
+                <p>Let's delve into the code to see how the Discord chatbot with voice interaction is implemented using Python. 
+                    The code consists of several components:
+                </p>
+                <h5>Libraries & Helper Functions</h5>
+                <pre><code class="language-python" style="font-size: small;">import discord
+from discord.ext import commands
+from dotenv import load_dotenv
+import os
+from discord import FFmpegOpusAudio
+from googleTTS import googleTTS # This uses Google's TTS
+from openAIchatbot import simplechat # This uses OpenAI's chatbot
+
+def open_file(filepath):
+    with open(filepath, 'r', encoding='utf-8') as infile:
+        return infile.read()</code></pre>
+                    <p>We start by importing the necessary libraries and functions. 
+                        Discord.py handles the bot setup and interactions, dotenv loads environment variables, and the TTS and chatbot functions handle text-to-speech and conversational responses.
+                    </p>
+                <h5>Bot Setup</h5>
+                <pre><code class="language-python" style="font-size: small;"># Load variables from the .env file
+load_dotenv()
+discordAPI = os.getenv("DISCORD")
+
+intents = discord.Intents.default()
+intents.voice_states = True
+intents.message_content = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')</code></pre>
+                    <p>Here, we set up the bot with necessary intents and load the Discord API token from a .env file. 
+                        The on_ready event confirms the bot has logged in successfully.
+                    </p>
+                <h5>Joining and Leaving Voice Channels</h5>
+                <pre><code class="language-python" style="font-size: small;">@bot.command(pass_context=True)
+async def join(ctx):
+    if(ctx.author.voice):
+        channel = ctx.message.author.voice.channel
+        await channel.connect()
+    else:
+        await ctx.send("You are not in a voice channel")
+
+@bot.command(pass_context=True)
+async def leave(ctx):
+    if(ctx.voice_client):
+        await ctx.voice_client.disconnect()
+    else:
+        await ctx.send("I am currently not in a voice channel")</code></pre>
+                    <p>These functions allow the bot to join and leave voice channels. 
+                        The join function checks if the user is in a voice channel and connects the bot to that channel. 
+                        The leave function disconnects the bot from the voice channel.
+                    </p>
+                <h5>Handling User Queries</h5>
+                <pre><code class="language-python" style="font-size: small;">conversation = []
+
+@bot.command(pass_context=True)
+async def ask(ctx):
+    global conversation
+    input_prompt = ctx.message.content[5:]
+    file_path_audio = 'output.mp3'
+    output_text, conversation = simplechat(message=input_prompt, conversation=conversation)
+    if ctx.voice_client and ctx.author.voice:
+        googleTTS(output_text)
+        voice = ctx.voice_client
+        source = FFmpegOpusAudio(source=file_path_audio)
+        await ctx.send(output_text)
+        voice.play(source)
+    else:
+        await ctx.send(output_text)</code></pre>
+                    <p>The ask command handles user queries. It sends the query to the chatbot, receives a response, and checks if the bot and user are in a voice channel.
+                         If they are, it converts the response to speech and plays it in the voice channel.
+                    </p>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>Chatbot and TTS Functions</h4>
+                <p>The chatbot and TTS functions are implemented separately to handle conversational responses and text-to-speech conversion. 
+                    The chatbot function can use OpenAI's GPT-3.5 model or MistralAI to generate a response, while the TTS function uses Google's TTS service to convert text to speech.
+                </p>
+                <h5>OpenAI Chatbot</h5>
+                <pre><code class="language-python" style="font-size: small;">import openai
+import os
+import dotenv
+
+dotenv.load_dotenv()
+openai.api_key = os.getenv("OPENAI")
+
+def open_file(filepath):
+    with open(filepath, 'r', encoding='utf-8') as infile:
+        return infile.read()
+
+def simplechat(message, conversation):
+    prompt = open_file('prompt.txt')
+    limit = 2
+    if len(conversation) > limit:
+        conversation = conversation[limit:len(conversation)+1]
+    conversation.append({"role": "user", "content": message})
+    messagesinput = conversation.copy()
+    messagesinput.insert(0, {"role": "system", "content": prompt})
+    chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messagesinput)
+    reply = chat.choices[0].message.content
+    conversation.append({"role": "assistant", "content": reply})
+    return reply, conversation</code></pre>
+                    <p>This function handles the interaction with OpenAI's GPT-3.5 model, maintaining a conversation history and generating responses.
+                    </p>
+                <h5>Google TTS</h5>
+                <pre><code class="language-python" style="font-size: small;">from google.cloud import texttospeech
+
+def googleTTS(input):
+    client = texttospeech.TextToSpeechClient()
+    synthesis_input = texttospeech.SynthesisInput(text=input)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="en-US",
+        ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
+        name="en-US-Standard-F"
+    )
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        speaking_rate=1.10,
+        pitch=0.8
+    )
+    response = client.synthesize_speech(
+        input=synthesis_input, voice=voice, audio_config=audio_config
+    )
+    with open("output.mp3", "wb") as out:
+        out.write(response.audio_content)
+        print('Audio content written to file "output.mp3"')</code></pre>
+                    <p>This function converts text input into speech using Google's TTS service and saves the audio output to a file.
+                    </p>
+                </section>
+                <hr />
+                <!-- Six -->
+                <section id="six">
+                <h4>Experimentation and Exploration</h4>
+                <p>Building a Discord chatbot with voice interaction opens up a world of possibilities for experimentation and exploration. 
+                    You can integrate different chatbot APIs, TTS services, and AI models to enhance the bot's capabilities and create engaging user experiences.
+                </p>
+                <ul>
+                    <li><strong>Custom Chatbot Prompts:</strong> Modify the prompt.txt file to change the behavior and responses of the chatbot.</li>
+                    <li><strong>Different TTS Voices:</strong> Experiment with different voice settings in the Google TTS function to change the voice and tone of the responses.</li>
+                    <li><strong>Enhanced Interactivity:</strong> Add more commands to the bot to handle different types of interactions and responses.</li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Seven -->
+                <section id="seven">
+                <h4>Conclusion</h4>
+                <p>Creating a Discord chatbot with voice interaction is a fascinating project that combines multiple technologies to enhance user engagement. 
+                    This project provided valuable insights into bot development, text-to-speech integration, and using AI chatbots. 
+                    I hope this post has inspired you to explore bot development and perhaps experiment with your own implementations.
+                </p>
+                <p>Thank you for reading, and happy coding! The entire code for this project can be found <a href="https://github.com/aidanvidal/Discord-AI-Talk-Chat-Bot" target="_blank">here</a>.</p>
+                </section>
+                <hr />
+                <!-- Eight -->
+                <section id="eight">   
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: June 3, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
