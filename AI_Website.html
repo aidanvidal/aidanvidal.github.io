@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Building a Voice-Activated Chatbot with JavaScript</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Project Overview</a></li>
+                <li><a href="#three">What I Learned</a></li>
+                <li><a href="#four">Implementing the Voice-Activated Chatbot</a></li>
+                <li><a href="#five">Experimentation and Exploration</a></li>
+                <li><a href="#six">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Building a Voice-Activated Chatbot with JavaScript</h2>
+                <p>Diving into various programming techniques can be both educational and immensely exciting. 
+                    One project that particularly caught my eye involves building a voice-activated chatbot using JavaScript. 
+                    This project integrates several APIs, including OpenAI for natural language processing, Whisper for audio transcription, and Eleven Labs for text-to-speech conversion, to create a seamless user experience.              
+                </p>
+                <p>In this blog post, I'll guide you through the process of developing this chatbot, explaining the code and sharing insights along the way. 
+                    By the end, you'll understand how to set up a voice-activated chatbot and implement it using JavaScript.
+                </p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Project Overview</h4>
+                <p>This project combines multiple APIs to create an interactive chatbot that listens to user input, converts audio to text, processes the text using OpenAI's GPT-3.5 model, and converts the responses back to speech. 
+                    This setup allows for a fluid conversation with the chatbot through voice commands.
+                </p>
+                <p>My implementation maintains a conversation history to ensure the bot's responses are contextually relevant. 
+                    To manage performance and memory, the conversation history is truncated periodically.
+                </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>What I Learned</h4>
+                <ul>
+                    <li><strong>API Integration:</strong>Learned how to integrate different APIs to handle tasks like transcription, generating responses, and text-to-speech conversion.</li>
+                    <li><strong>User Interface Management:</strong> Improved skills in managing user interactions and dynamically updating the web page using JavaScript.</li>
+                    <li><strong>Audio Processing:</strong> Gained experience in handling audio input, processing it, and converting text back to audio.</li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Implementing the Voice-Activated Chatbot</h4>
+                <p>Let's break down the key components and explore how to implement the voice-activated chatbot using JavaScript.</p>
+                <h5>Conversation History</h5>
+                    <p>The conversation history is stored in an array, allowing the bot to maintain context and generate relevant responses.
+                        The history is truncated to manage memory and performance.
+                    </p>
+                <h5>Getting the Chatbot Response</h5>
+                    <p>We send the user's input to OpenAI's GPT-3.5 API and retrieve the chatbot's response. 
+                        The conversation history is managed to keep context relevant and concise. 
+                        This involves pushing user inputs and bot responses to the conversation array and trimming it to maintain a manageable length.
+                    </p>
+                <h5>Audio Transcription</h5>
+                    <p>To handle audio inputs, we use OpenAI's Whisper API to convert spoken input into text. 
+                        This involves uploading an audio file and retrieving the transcribed text.
+                        I created a blob from the audio input and sent it to the Whisper API for transcription.
+                    </p>
+                    <pre><code class="language-javascript" style="font-size: small;">// Create a new Blob object and pass the recorded data to it
+const blobTranscript = new Blob(chunks, { type: "audio/wav" });
+chunks = [];
+// Get the transcript from the audio
+user_text = await getTranscript(blobTranscript);</code></pre>
+                <h5>Text-to-Speech Conversion</h5>
+                    <p>For converting text responses into speech, Eleven Labs' API is used. 
+                        The text is sent to the API, which returns an audio file that is then played back to the user.
+                        I have limited free access to the Eleven Labs API, so I cannot guarantee that the TTS function will work.
+                    </p>
+                <h5>Handling User Input</h5>
+                <p>The user interface includes input fields for text, a dropdown for selecting prompts, and buttons for controlling voice recording. 
+                    When a user enters text or uses the voice command, the chatbot processes the input and provides a response, which can also be spoken back using text-to-speech.
+                </p>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>Experimentation and Exploration</h4>
+                <p>Once the basics are in place, you can start experimenting with different functionalities:</p>
+                <ul>
+                    <li><strong>Custom Prompts:</strong> Add custom prompts to guide the conversation and provide users with options.</li>
+                    <li><strong>Enhanced Responses:</strong> Improve the chatbot's responses by incorporating more context and personalization.</li>
+                    <li><strong>Multi-Language Support:</strong> Implement multi-language support to cater to a wider audience.</li>
+                    <li><strong>Enhanced Interactivity:</strong> Add more commands to the bot to handle various interactions and responses.</li>
+                </ul>
+                <!-- Six -->
+                <section id="six">
+                <h4>Conclusion</h4>
+                <p>Creating a voice-activated chatbot is a fascinating project that combines multiple technologies to enhance user engagement. 
+                    This project provided valuable insights into bot development, text-to-speech integration, and using AI chatbots. 
+                    I hope this post has inspired you to explore bot development and perhaps experiment with your own implementations.
+                </p>
+                <p>The website for this project can be found <a href="https://aidanvidal.github.io/AI_Website/">here</a>, but like I said earlier in this post
+                    some features may not work due to usage limits on the free tokens.
+                </p>
+                </section>
+                <hr />
+                <!-- Seven -->
+                <section id="seven">   
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: June 11, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
