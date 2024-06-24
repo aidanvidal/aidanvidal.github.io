@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Game Dev Post 1</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Introduction</a></li>
+                <li><a href="#three">Sprites</a></li>
+                <li><a href="#four">Scripting</a></li>
+                <li><a href="#five">HUD</a></li>
+                <li><a href="#six">Future Plans</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Game Dev Post 1</h2>
+                <p>Hello, in this post and future posts I will be detailing my expierences with game development and the project I am working on. 
+                    I hope you enjoy reading about my journey and the things I have learned along the way.</p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Introduction</h4>
+                <p>I have never made a game before but I have always wanted to try, so when I had some time this summer I decided to just throw myself into game development.
+                    I wanted to create everything in my game from scratch, besides the actual engine, so I could learn as much as possible and challenge myself.
+                    I started off with getting a basic idea of what I wanted to make. I landed on a bullet hell game that is heavily inspired by "Enter the Gungeon".
+                    I now needed to pick a engine on which I can build my game in. I did some research and picked Godot, as it seemed to be the best fit for my game.
+                </p>
+                <p>Some more background on my game is that it will be a 2D bullet hell game.
+                    I hope to eventually add procedural generation so I can try to make it a rougelite/rougelike.
+                    I'm still not sure on the details of the game but my overall thought is that there will be a procedurally generated level with one boss
+                    where you win if you kill the boss. I want to limit the scope of my game so I can hopefully eventually finish it.
+                </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>Sprites</h4>
+                <p>I wouldn't consider myself an artist, I don't draw much, and I'm not very good at it. 
+                    So I decided to go with a pixel art style for my game. I used Piskel,
+                    a free online sprite editor that is very easy to use and has a lot of features.
+                    I found it very easy to use and I was able to make some decent sprites for my game. 
+                    I made sprites for the player, bullets, and a basic mob (a slime). 
+                    I also made a few different tiles for the level. 
+                    I'm happy with how they turned out and I think they will work well in my game. 
+                </p>
+                <p>
+                    I've so far only animated a few sprites, a basic mob and the bullets.
+                    I'm happy with my progress in spriting, I've gotten better and more importantly I've become faster.
+                    I've also learned a lot about pixel art and animating sprites. I didn't even know about gradiants before but now
+                    I do and I think they can really help make sprites and tiles look better.
+                </p>
+                <div style="text-align: center;">
+                    <img src="https://piskel-imgstore-b.appspot.com/img/3ea15be8-324f-11ef-99e8-952e961ebf51.gif" alt="Slime mob" style="width: 200px; height: auto;">
+                </div>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Scripting</h4>
+                <p>Now comes the fun part! I get to start scripting the game. Godot has their own scripting language that is built into the engine. 
+                    I started off by scripting the player, I made it so the player can move around which was really simple with Godot.
+                    I then made bullets spawn from the player and go in the direction of the cursor. 
+                    I then scripted the bullets, which required me to learn about collision detection and how to delete objects.
+                    I also had to use some trigonometry to get the bullets to go in the right direction and I wanted a bullet spread for different guns
+                    such as shotguns, so I used some more math to get that to work. I added some firing error to the bullets
+                    to add some difficulty to the game.
+                </p>
+                <p>
+                    The most difficult part of scripting so far has been the mob AI. 
+                    I wanted the mob to move towards the player and stop when it reaches a certain distance.
+                    I also wanted it to attack periodically. Getting the mob to shoot towards the player was simple,
+                    but getting it to track the player and dodge collisions was difficult. I eventually got something
+                    that works but is not perfect. I will have to come back to it later to make it better.
+                </p>
+                <p>
+                    Collisions are baked into the game engine itself so it was actually pretty easy to work with them.
+                    I did run into a few issues, but with some research and reading the documentation I was able to get 
+                    everything working.
+                </p>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>HUD</h4>
+                <p> The last thing I have worked so far is the HUD.
+                    I wanted to keep it simple so I just added a health bar and a ammo counter.
+                    I still need to actually create a reload animation but I have the logic for it in place.
+                    The HUD wasn't too difficult to make, I just had to learn how to use the UI elements in Godot.
+                    I also made everything dynamic and so I can easily change the size of the health bar or the ammo counter
+                    to correspond with what I need. 
+                </p>
+                <hr />
+                <!-- Six -->
+                <section id="six">
+                <h4>Future Plans</h4>
+                <p>I'm happy with what I have so far, but I haven't even gotten to the tricky part yet, procedural generation.
+                    I also need to add more mobs, guns, and a boss. I might potentially add a shop system where you can buy power ups.
+                    I'm also thinking about adding a dodge mechanic, but I'm not sure yet.
+                </p>
+                <p>
+                    The music and sound effects for the game I hope to also do from scratch. I have some expierence with music
+                    production so I'm not too worried about that. As for sound effects I'm not entirely sure on how to do them,
+                    so I might source them from somewhere else.
+                </p>
+                <p>
+                    Overall this project has been so much fun and insightful so far. I have really enjoyed learning about game development
+                    and what goes into making a game solo. I hope to continue to work on this project and eventually finish it, but I'm not in a rush.
+                    I still have the hardest parts to come and I want to make sure I do them right.
+                </p>
+                <p>
+                    Thanks for reading.
+                </p>
+                </section>
+                <hr />
+                <!-- Seven -->
+                <section id="seven">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: June 24, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
