@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Game Dev Post 2</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Introduction</a></li>
+                <li><a href="#three">Creating The Randomness</a></li>
+                <li><a href="#four">Creating Connections</a></li>
+                <li><a href="#five">Final Result</a></li>
+                <li><a href="#six">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Game Dev Post 1</h2>
+                <p>In this post I talk about my process creating procedurally generated levels and the 
+                    challenges I faced during it.</p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Introduction</h4>
+                <p> I knew that I wanted to have procedurally generated levels since the start of my project.
+                    I think it adds a lot of replayability to a game and it's a fun challenge to implement.
+                    I started off by researching how to implement procedural generation in Godot.
+                    I found a few tutorials and articles that helped me understand the basics of procedural generation.
+                    I then started to implement my own system. 
+                </p>
+                <p> Procedural generated levels are a key feature of rougelike/rougelite games, which I want to make.
+                    Some notable games that inspired me are "The Binding of Issac" and "Enter the Gungeon". Both of these games
+                    use premade tiles/rooms that are randomly placed together to create a level. I wanted to do something similar.
+                    Initially I wanted my level design to resemble the levels in "Enter the Gungeon", but during development
+                    I faced some challenges with this and decided to pivot and go with a design that closley resembles "The Binding of Issac".
+                </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>Creating the Randomness</h4>
+                <p> Before I started coding, I did some research on how different games created their procedurally generated levels.
+                    I focused more on the ones that were similar to what I wanted to create.
+                    I tried many different ways to generate a random level layout. The first way I did this was by
+                    generating a random graph given an array of edges, then mutating the graph to create a room layout. This is what was done
+                    in "Enter the Gungeon".
+                    This worked very well. I was able to create a room layout that was random and had a good amount of variety.
+                </p>
+                <p> Another way I tried to generate a level layout was by first randomly placing the rooms then connecting them
+                    using Prim's algorithm. This also worked well but had usually only had one path, whereas the graph method generated branching paths. 
+                    Both of these methods were good but the real trouble came when trying to connect the rooms with corridors.
+                </p>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Creating Connections</h4>
+                <p> Oh man, did I have trouble with this. This was by far where most of my time was spent. 
+                    I managed to connect the rooms using A* to draw the paths that Prim's algorithm created.
+                    The resulting paths were good and did connect the rooms. However the issue came when I tried to
+                    make the paths and rooms look good. I couldn't find a way to combine them in a way that looked good and 
+                    functioned well. I tried many different ways to do this but I couldn't find a way that worked well.
+                    Below was one of my attempts at this.  
+                </p>
+                <img src="images/Failed_Result.png" alt="Path Fail" style="width: 800px; height: auto;">
+                <p> Most of the difficulty came from trying to combine the tilemaps of the rooms and the paths.
+                    The rooms are in their own scene and added as child nodes to the main scene. The paths are drawn on the main scene.
+                    This caused conflict in the tilemaps and I couldn't find a way to combine them. I tried many different ways to do this
+                    but there was always some overlap and it didn't look good at all. Also the paths were not always connected to the middle of the rooms
+                    which is where the doors would be.
+                </p>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>Final Result</h4>
+                <p> Eventually, I decided to pivot and go with a design that was more similar to "The Binding of Issac".
+                    This means that instead of chambers that connected the rooms the player would just be teleported to the
+                    connecting room. This was much easier to implement and looked much better since I didn't have to mess around with creating paths. 
+                    I'm happy with the result. I chose to use my original design of creating a random graph and then mutating it. 
+                    Below is a image of the final result in graph format.
+                </p>
+                <img src="images/Tp_Graph.png" alt="Graph" style="width: 800px; height: auto;">
+                <p> With the procedurally generation finally done, I will move my focus onto creating mobs, guns, and a boss. 
+                    I want to focus more on the game desgin aspect now. I'm excited to see how this project will turn out. 
+                </p>
+                <hr />
+                <!-- Six -->
+                <section id="six">
+                <h4>Conclusion</h4>
+                <p> My expierence with procedural generation was a fun and challenging one. I learned a lot about how to create
+                    random levels and how to connect them. I'm happy with the result and I think it will add a lot to my game.
+                    I'm excited to see how the rest of the game will turn out.
+                </p>
+                <p>
+                    Thanks for reading.
+                </p>
+                </section>
+                <hr />
+                <!-- Seven -->
+                <section id="seven">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: July 4, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
