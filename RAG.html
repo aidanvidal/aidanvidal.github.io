@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>RAG Post</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Introduction</a></li>
+                <li><a href="#three">How Does RAG Work?</a></li>
+                <li><a href="#four">My Implementaion</a></li>
+                <li><a href="#five">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>RAG Post</h2>
+                <p>Among the innovative techniques in AI, RAG stands out as a powerful approach that combines the strengths 
+                    of retrieval-based and generative models. 
+                    In this blog post, I will explore what RAG is, how it works, and how I made my own.</p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Introduction</h4>
+                <p>Retrieval-Augmented Generation (RAG) is a hybrid AI model that integrates retrieval-based mechanisms with generative capabilities to produce more accurate and contextually relevant responses. 
+                    Traditional generative models, such as ChatGPT, rely solely on the data they were trained on, which can limit their ability to provide accurate information if their training data does not cover a specific query in detail. Usually these chat models lack information on current events. 
+                    Retrieval-based models, on the other hand, fetch relevant information from a large dataset or knowledge base but might not always generate coherent and contextually appropriate responses.
+                </p>
+                <p>RAG models bridge this gap by combining both approaches: they retrieve relevant documents or pieces of information from a dataset and then use a generative model to create a response based on the retrieved information. 
+                    This synergy allows RAG models to generate responses that are not only contextually rich but also factually accurate.
+                </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>How Does RAG Work?</h4>
+                <p>RAG operates in two main stages: retrieval and generation.</p>
+                <h5>Retrieval</h5>
+                <p>In the retrieval stage, the RAG model searches a large dataset or knowledge base for relevant information based on the input query. 
+                    This dataset can be a collection of documents, web pages, or any other source of information that the model has been trained on. 
+                    The retrieval process is typically performed using a dense retrieval mechanism, which encodes the input query and the dataset into dense vectors and then calculates the similarity between them to identify the most relevant information.
+                </p>
+                <h5>Generation</h5>
+                <p>Once the relevant information has been retrieved, the RAG model uses a generative mechanism, such as a transformer-based language model, to generate a response based on the retrieved information. 
+                    The generative model takes the retrieved documents as input and uses them to provide context and generate a coherent and contextually relevant response to the input query.
+                </p>
+                <img src="images/rag.jpeg" alt="RAG Model" style="width:100%">
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>My Implementaion</h4>
+                <p> I used Wikipedia as my dataset for my RAG model. You can enter a Wikipedia category and it will use
+                    the articles in that category to generate a response to your query. Before I could use the Wikipedia articles,
+                    I first had to clean the data and convert it into a format that the model could understand. I used the Hugging Face
+                    Tokenizers library to tokenize the data and create chunks that the embedding model could use. Chunks are important because a
+                    single article can be too large for the model to handle. 
+                </p>
+                <p>
+                    The embedding model I used was Jina AI on the Hugging Face Transformers library. I then stored the emebeddings in a 
+                    csv file and wrote a function that will sort the embeddings based on the similarity to the input query, this is done 
+                    in O(n) time. I then used give a LLama model the top 5 relevant embeddings and a custom prompt to generate a response.
+                    I will link the google colab notebook below.
+                </p>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="Five">
+                <h4>Conclusion</h4>
+                <p>There are many ways to improve the RAG model I built. One way is to use a vectorized database to store the embeddings
+                    and use a more efficient way to search for the most relevant embeddings. 
+                    I used the LLama model because it was open source and free to use but using other models could produce better/different results.
+                <p>
+                <p>
+                    This little project was a great learning experience for me and I hope to build on it in the future. I learned a lot about
+                    RAG models and how they work. I also learned how to use the Hugging Face Transformers library and web text cleaning.
+                </p>
+                    Here's the link to the google colab notebook: <a href="https://colab.research.google.com/drive/1FhUQo7SK7Q63vgAxX8TF_AARaLY7KvgX?usp=sharing">RAG Model</a>
+                    Thanks for reading!
+                </p>
+                </section>
+                <hr />
+                <!-- Seven -->
+                <section id="seven">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: July 17, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
