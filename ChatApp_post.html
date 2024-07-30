@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Chat App</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Introduction</a></li>
+                <li><a href="#three">Frontend</a></li>
+                <li><a href="#four">Backend</a></li>
+                <li><a href="#five">Deploying</a></li>
+                <li><a href="#six">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-linkedin" target="_blank"><span class="label">Linkedin</span></a></li>
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Chat App</h2>
+                <p>This post will go through my experience making a Electron and Web Chat App. I will talk about what I used and 
+                    difficulties I faced during the process. I will also talk about what I learned throughout the process.
+                </p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Introduction</h4>
+                <p>The reason why I wanted to make something involving networking is because I have never done it before and 
+                    I was curious about how it worked. I was watching videos on youtube on how the internet works and routing and 
+                    the OSI model and I thought it would be cool to make something that uses the internet to communicate.
+                    I have never made anything using HTTP requests or websockets before, so I decided to make a simple chat app
+                    to learn about both.
+                </p>
+                <p>
+                    At first I only wanted to make a desktop application so I decided to use Electron along with HTML, CSS, and JavaScript.
+                    Along the way I realized that I could also make a web version of the app using the same codebase and only needed to
+                    change some things.
+                </p>
+                <p>
+                    I decided to use Flask to handle the HTTP requests since I wanted to code the backend in Python.
+                    I used the standard websockets library for Python to handle the websockets. I used SQLite as my
+                    database since I didn't need anything too complex.
+                </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>The Frontend</h4>
+                <p>
+                    The frontend part of the app posed the most difficulties for me. Organizing the code and making sure everything
+                    worked together was a challenge. I had to learn about how to use websockets and how to send HTTP requests.
+                    I also had to make sure variables were being passed and shared correctly across the frontend.
+                </p>
+                <p>
+                   Using Electron wasn't bad at all, everything was easy to setup and made sense. Creating functions to 
+                   handle the websockets and HTTP requests was simple. I used the standard websockets library for JavaScript to handle
+                    the websockets. I used the fetch API to handle the HTTP requests. Overall the frontend development for the desktop
+                    app was pretty easy. However, I did run into issues when trying to convert the desktop app to a web app. This was because
+                    I was using some Electron specific functions to share variables that didn't work in the browser. 
+                    I had to rewrite some of the code to get it to work.
+                </p>
+                <div style="text-align: center;">
+                    <img src="images/Chat_App.png" alt="Chat App" style="width: 80%; height: 80%;">
+                </div>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>The Backend</h4>
+                <p>
+                    The backend was the easiest part of the app. I used Flask to handle the HTTP requests and the websockets library
+                    for Python to handle the websockets. Learning how to write RESTful APIs was interesting and I learned a lot about
+                    how to structure them. I also learned about the websocket handshake and how to send messages back and forth.
+                    Honestly the most difficult part about using HTTP and websockets was organizing the requests and making sure I understood
+                    what it was I was sending and receiving. I didn't add security to the app since it was just a small project and I didn't
+                    think it was necessary so I didn't have to worry about that.
+                </p>
+                <p>
+                    The database was handled using SQLite. I didn't need anything too complex so I decided to use SQLite. I learned how to
+                    create tables and insert data into them. I also learned how to query the database and get the data I needed.
+                    I used a python library called sqlite3 to interact with the database. It was pretty easy to use and I didn't run into any issues.
+                </p>
+                <p>
+                    The biggest time sink was bug fixing. Most bugs steamed from the fact that python was a dynamically typed language
+                    and when I wrote my code the first time I didn't account for this. So when I was getting an error I didn't even think that
+                    it could be because of a type error. I had to go back and add static typing to my code to make sure I wasn't passing the wrong
+                    type of data. This was a good learning experience and I'm glad I ran into this issue because I would hate to have this issue 
+                    with a larger project.
+                </p>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>Deploying</h4>
+                <p> 
+                    I used DigitalOcean to host my server. I had never done anything like this before so I was a bit nervous. I followed a tutorial
+                    on how to setup a server and how to deploy a Flask app. I was able to all my files into my cloud machine using rsync. I then 
+                    installed all the dependencies and ran the app. I was able to access the app from my browser and everything worked as expected.
+                    I then used systemd to make sure the app was always running. Deploying the app was a great learning experience and also proved
+                    to be more challenging than I thought, but I'm glad I did it since it is a very useful skill to have.
+                </p>
+                <hr />
+                <!-- Six -->
+                <section id="six">
+                <h4>Conclusion</h4>
+                <p>
+                    This project was really fun for me to work on. I had a great time making my custom websockets and HTTP requests. I learned a lot
+                    about how the internet works and my JavaScript ability has also improved. What I think the most important thing I learned was how
+                    to deploy a server. This is a very useful skill to have and I'm glad I learned how to do it. I also learned how databases work and 
+                    how to interact with them. I think this project was a great learning experience and I'm glad I did it.
+                </p>
+                <p>
+                    You can find the code and desktop app version for this project on my Github <a href="https://github.com/aidanvidal/Chat-App" target="_blank">here</a>.
+                    You can connect to the app using the following link: <a href="http://68.183.31.37/" target="_blank">Chat App</a>.
+                    I didn't buy a domain name so you will have to use the IP address to connect to the app.
+                </p>
+                <p>
+                    Thanks for reading.
+                </p>
+                </section>
+                <hr />
+                <!-- Seven -->
+                <section id="seven">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: July 30, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
