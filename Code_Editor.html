@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Building a Real-time Collaborative Code Editor</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Project Overview</a></li>
+                <li><a href="#three">Implementation Challenges</a></li>
+                <li><a href="#four">Tech Stack</a></li>
+                <li><a href="#five">How It Works</a></li>
+                <li><a href="#six">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Building a Real-time Collaborative Code Editor</h2>
+                <p>In this post, I’ll walk you through the creation of a real-time collaborative code editor using React on the client side and Node.js with ShareDB on the server side. This project allows multiple users to edit code simultaneously, with real-time updates reflected across all clients.</p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Project Overview</h4>
+                <p>This project uses technologies like React for the client interface, ShareDB for document synchronization, WebSockets for real-time communication, and MongoDB for persistent document storage. The editor also supports live code execution via VM2 on the server.</p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>Implementation Challenges</h4>
+                <ul>
+                    <li><strong>Cursor Synchronization:</strong> One particularly tricky part of real-time collaboration is synchronizing user cursor positions across clients. If a user’s cursor or selection changes, that information needs to be sent to all other users. I implemented this using ShareDB’s presence feature, which allows tracking each user’s presence and actions in the document.
+                        The challenge here was ensuring that cursor movements are updated in real-time and rendered correctly for each user, without causing flickering or incorrect positioning. I had to dynamically create and manage markers in the AceEditor for each remote user’s cursor and ensure they were removed once the user left the session.
+                        </li>
+                    <li><strong>Document Syncing:</strong> Handling Real-time Collaboration
+                        One of the core features of this project is real-time collaboration, which means that multiple users should be able to edit the same document simultaneously. This was a key challenge, as it required dealing with multiple types of data updates—some coming from the server and others from local users.
+                        To solve this, I used ShareDB with WebSockets. ShareDB allowed us to handle operational transformations (OT), a method that ensures that document changes are synchronized in the correct order across clients. This ensures that if multiple users edit the document at the same time, their changes are applied without overwriting each other. Managing conflicts, cursor synchronization, and maintaining a smooth user experience took careful planning and testing.
+                        </li>
+                    <li><strong>Secure Code Execution:</strong> The editor allows users to run code within a secure sandboxed environment on the server. However, allowing users to execute arbitrary code poses a huge security risk, especially if malicious code attempts to access the server’s file system or other resources.
+To mitigate this risk, I used the VM2 package, which provides a sandboxed environment for running untrusted code with limited access to the server’s resources. Additionally, I set time limits on code execution to prevent infinite loops from blocking the server.
+Implementing proper error handling within the VM2 sandbox was another challenge. If user code caused an exception or consumed too many resources, I had to ensure the server would catch the error gracefully and respond to the client with useful feedback, without crashing the entire application.</li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Tech Stack</h4>
+                <ul>
+                    <li><strong>React:</strong> Used for the client-side UI with AceEditor integration for code editing.</li>
+                    <li><strong>ShareDB:</strong> Real-time collaboration and document synchronization across clients.</li>
+                    <li><strong>WebSockets:</strong> Enables real-time, low-latency communication between server and clients.</li>
+                    <li><strong>MongoDB:</strong> Used to store document states for persistence and collaboration.</li>
+                    <li><strong>VM2:</strong> A secure sandbox environment for running JavaScript code on the server.</li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>How It Works</h4>
+                <h5>Backend: Node.js and ShareDB</h5>
+                <p>The server was built using Express to handle HTTP requests and WebSockets for real-time communication. ShareDB provided the functionality to sync document changes between the clients. 
+                    I also set up a MongoDB database to persist document states, so that users could leave and rejoin a session without losing their work.
+                </p>
+                <pre><code class="language-javascript" style="font-size: small;">
+// Server code snippet
+const ShareDB = require("sharedb");
+const WebSocket = require("ws");
+const ShareDBMongo = require("sharedb-mongo");
+
+const db = ShareDBMongo('mongodb://localhost:27017/sharedb');
+const backend = new ShareDB({ db, presence: true });
+
+const wss = new WebSocket.Server({ server });
+wss.on("connection", (ws) => {
+    const stream = new WebSocketJSONStream(ws);
+    backend.listen(stream);
+});
+                </code></pre>
+                <p>A major decision was to implement presence tracking with ShareDB. 
+                    This allowed the server to track and broadcast each user’s connection status, cursor movements, and even typing indicators. This presence feature greatly enhanced the collaborative experience.                </p>
+                <h5>Frontend: React and AceEditor</h5>
+                <p>For the client, I chose React due to its component-based architecture and ease of integrating third-party libraries like AceEditor. 
+                    AceEditor provided an out-of-the-box solution for code editing, but it also required customizations to handle features like autocomplete, syntax highlighting, and multi-user cursor tracking.
+                </p>
+                <p>I implemented ReconnectingWebSocket on the client to ensure that if a WebSocket connection was dropped (due to network issues, for example), the client would automatically try to reconnect. 
+                    This was crucial for maintaining seamless collaboration.
+                </p>
+                <pre><code class="language-javascript" style="font-size: small;">
+// Client code snippet
+useEffect(() => {
+    const socket = new ReconnectingWebSocket('ws://localhost:3001');
+    const connection = new sharedb.Connection(socket);
+    const doc = connection.get('examples', 'textarea');
+    
+    doc.subscribe((err) => {
+        if (err) throw err;
+        setContent(doc.data.content || '');
+        
+        doc.on('op', (op, source) => {
+            if (!source) {
+                applyOpToAce(op);
+            }
+        });
+    });
+}, []);
+                </code></pre>
+                <p>I also integrated AceEditor with ShareDB so that changes made in the editor were reflected in real-time across clients. 
+                    React’s state management made it easy to keep track of the document’s content, cursor positions, and other collaborative features.
+                </p>
+                </section>
+                <hr />
+                <!-- Six -->
+                <section id="six">
+                <h4>Conclusion</h4>
+                <p>The overall development process required balancing real-time features, security concerns, and performance optimization, while ensuring that the user experience remained smooth and intuitive. 
+                    The result is a real-time collaborative code editor that supports multi-user editing and code execution, all within a responsive, secure environment.</p>
+                <p>This project demonstrates the power of combining React, Node.js, and ShareDB to build a real-time collaborative code editor. The real-time document synchronization, combined with secure code execution, makes this project an exciting example of what modern web technologies can achieve.</p>
+                <p>Here is a little demo of the project: </p>
+                <img src="gifs/RealTime-Code-Editor.gif" alt="Real-time Code Editor" style="width: 1000px; height: auto;">
+                <p>Here is the <a href="https://github.com/aidanvidal/Real-time-Code-Editor" target="_blank">link</a> to the repo where the code is. Happy reading and have a good day!</p>
+                </section>
+                <hr />
+                <!-- Seven -->
+                <section id="seven">   
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: Septemeber 24, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
