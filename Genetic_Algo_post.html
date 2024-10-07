@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Genetic Algorithm Fun</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="#two">Introduction</a></li>
+                <li><a href="#three">Frontend</a></li>
+                <li><a href="#four">Backend</a></li>
+                <li><a href="#five">Deploying</a></li>
+                <li><a href="#six">Conclusion</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Genetic Algorithms</h2>
+                <p>Genetic Algorithms (GAs) are a fascinating and powerful method of solving optimization problems by mimicking the process of natural selection and evolution. 
+                    They belong to the family of evolutionary algorithms, which are inspired by Darwin’s theory of evolution. 
+                    Genetic algorithms are widely used to solve complex problems, including optimization, machine learning, artificial intelligence, and even artistic creation.
+                </p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>What Are Genetic Algorithms?</h4>
+                <p>Genetic Algorithms are heuristic search methods used for solving optimization and search problems. 
+                    They are particularly effective when the problem space is large, nonlinear, or complex, where traditional approaches might fail or become inefficient.
+                </p>
+                <p>At their core, genetic algorithms operate by maintaining a population of possible solutions, which evolve over time. Each individual solution, often called a “chromosome,” is evaluated using a fitness function. 
+                    The better the solution, the higher its chance of being selected for reproduction.
+                </p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>How Do Genetic Algorithms Work?</h4>
+                <ul>
+                    <li><strong>Initialization:</strong> The algorithm starts with a randomly generated population of possible solutions (chromosomes). 
+                        These chromosomes are often represented as strings of binary numbers, but they can also be represented in other formats, such as real numbers or characters.</li>
+                    <li><strong>Selection:</strong> The algorithm evaluates each individual in the population using a fitness function, 
+                        which measures how well the solution solves the given problem. 
+                        The fittest individuals are selected for reproduction, ensuring that better solutions have a higher chance of passing their traits to the next generation.
+                    </li>
+                    <li><strong>Crossover:</strong> Crossover is a process where two parent solutions are combined to produce one or more offspring. 
+                        By mixing the genes (solution components) of the parents, the algorithm can create new solutions that may have better performance.</li>
+                    <li><strong>Mutation:</strong> To maintain genetic diversity within the population and prevent premature convergence to suboptimal solutions, 
+                        mutation is introduced. Mutation randomly alters some parts of the chromosome (e.g., flipping bits), introducing new traits that were not present in the parents.</li>
+                    <li><strong>Termination:</strong> The algorithm terminates when the stopping criteria are met, 
+                        such as reaching a certain number of generations or when the best solution’s fitness reaches a predefined threshold</li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>The Fun</h4>
+                <p>
+                    Let’s dive into what I built using genetic algorithms.
+                </p>
+                <ul>
+                    <li><strong>Wordle Solver</strong>
+                    <p>
+                        Wordle is a word puzzle game where players guess a five-letter word (my prgoram can take in any number of letters). 
+                        After each guess, feedback is provided: letters that are in the correct position, 
+                        letters that are part of the word but in the wrong position, and letters that are not in the word at all. 
+                        The goal is to find the correct word in a limited number of guesses.
+                        This program's chromosome is a string of letters where each chromosome represents a possible guess. The mutation operator randomly changes some of the letters in the guess,
+                        and the crossover operator combines two parent guesses to create a new guess. The fitness function evaluates the guess based on if the letter is in the word, and if the letter
+                        is in the correct spot.
+                    </p></li>
+                    <li><strong>Sodoku Solver</strong>
+                    <p>
+                        Sudoku is a 9x9 grid puzzle where the objective is to fill the grid with numbers from 1 to 9 in such a way that each number appears only once in each row, column, and 3x3 sub-grid.
+                        This program's chromosome is a 9x9 grid where each cell represents a number in the range [1, 9]. The initial population is generated by randomly filling the grid with valid numbers
+                        making sure to include the given values from the puzzle. The fitness function evaluates the solution by counting the number of conflicts in each row, column, and sub-grid.
+                        Since each chromosome starts with all the correct numbers (just in the wrong place), the algorithm only needs to move the numbers around to solve the puzzle.
+                    </p>
+                    <figure>
+                        <img src="images/Genetic_Algo_Sodoku.png" alt="Genetic Algorithm Sodoku">
+                        <figcaption>This is what the algorithm looks like when it solves a Sodoku puzzle.</figcaption>
+                    </figure>
+                    <p></p>
+                    </li>
+                    <li><strong>Image Evolution</strong>
+                    <p>
+                        The most fun program to work on was the image evolution program.
+                        Image evolution is a fun application of genetic algorithms where the goal is to evolve an image to match a target image.
+                        The initial population is generated by randomly creating images with random colors and shapes. The shapes are circles, rectangles, and triangles.
+                        Each chromosome in this program represents an image, and the fitness function evaluates the absoluate value of the difference between RGB values.
+                        The crossover in this program simiply copys one of the parent images. The mutation randomly changes one of the shapes in the image.
+                    </p>
+                    <figure>
+                        <img src="images/250_Shapes_Goomba.png" alt="Genetic Algorithm Goomba">
+                        <figcaption>This is what the algorithm produced after 1000 generations.</figcaption>
+                    </figure>
+                    </li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>Applications of Genetic Algorithms</h4>
+                <p> 
+                    The programs I built are just a few examples of the many applications of genetic algorithms. GAs have a wide range of applications due to their flexibility and ability to solve complex problems. 
+                    Some common areas where genetic algorithms are used include:
+                </p>
+                <ul>
+                    <li><strong>Optimization:</strong> Finding the best solution for complex optimization problems (e.g., scheduling, route planning).</li>
+                    <li><strong>Machine Learning:</strong> Tuning hyperparameters in neural networks or building feature selection mechanisms.</li>
+                    <li><strong>Game Playing:</strong> Evolving strategies for games such as chess or video games.</li>
+                    <li><strong>Scientific Research:</strong> Solving hard computational biology problems like protein folding or DNA sequence analysis.</li>
+                </ul>
+                <hr />
+                <!-- Six -->
+                <section id="six">
+                <h4>Conclusion</h4>
+                <p>
+                    Genetic algorithms are a powerful tool for solving complex optimization problems. They are versatile, efficient, and can be applied to a wide range of domains. 
+                    By mimicking the process of natural selection and evolution, genetic algorithms can find high-quality solutions to problems that are difficult to solve using traditional methods.
+                </p>
+                <p>
+                    I had a lot of fun building these programs and experimenting with different parameters and techniques. 
+                    The image evolution program, in particular, was a fun project that allowed me to explore the creative side of genetic algorithms.
+                    There is still so much more you can do to optimize these programs and make them more efficient, such as implementing elitism, 
+                    dynamic mutation rates, or parallel processing and changed the fitness function and other parameters.
+                </p>
+                <p>
+                    You can find the code for each of these projects, as well as a program that solves Sodoku using backtracking, on my Gitub <a href="https://github.com/aidanvidal/Genetic-Algorithm-Fun" target="_blank">here</a>.
+                    Thanks for reading and happy coding!
+                </p>
+                </section>
+                <hr />
+                <!-- Seven -->
+                <section id="seven">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: October 7, 2024</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+</body>
+</html>
