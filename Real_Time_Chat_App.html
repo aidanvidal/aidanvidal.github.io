@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Building a Real-Time Chat Application with React and Firebase</title>
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="prism.css" />
+  </head>
+
+  <body class="is-preload">
+    <section id="header">
+      <header>
+        <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+        <h1 id="logo">Aidan Vidal</h1>
+        <p>
+          A passionate developer with a love for coding and problem-solving. I
+          enjoy creating things that use AI as well as tackling smaller projects
+          that pique my interest.
+        </p>
+      </header>
+      <nav id="nav">
+        <ul>
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="#two">Project Overview</a></li>
+          <li><a href="#three">What I Learned</a></li>
+          <li><a href="#four">Implementing the Chat Application</a></li>
+          <li><a href="#five">Experimentation and Exploration</a></li>
+          <li><a href="#six">Conclusion</a></li>
+        </ul>
+      </nav>
+      <footer>
+        <ul class="icons">
+          <li>
+            <a
+              href="https://github.com/aidanvidal"
+              class="icon brands fa-github"
+              target="_blank"
+              ><span class="label">Github</span></a
+            >
+          </li>
+        </ul>
+      </footer>
+    </section>
+
+    <div id="wrapper">
+      <main class="main">
+        <article class="blog-post">
+          <div class="container">
+            <section id="one">
+              <h2>
+                Building a Real-Time Chat Application with React and Firebase
+              </h2>
+              <p>
+                Diving into frontend and backend technologies can be both
+                challenging and rewarding. In this project, I built a
+                <strong>real-time chat application</strong> using React,
+                Firebase, and authentication hooks. This project focuses on
+                managing user sessions, storing chat data in a database, and
+                rendering chat interfaces with dynamic updates.
+              </p>
+              <p>
+                I have built a previous real time chat application but I was not
+                very happy with the result. This time I wanted to make it look
+                better and function better. I also wanted some more features and
+                explore the capabilities of Firebase.
+              </p>
+            </section>
+
+            <hr />
+            <section id="two">
+              <h4>Project Overview</h4>
+              <p>
+                The chat application integrates <strong>Firebase</strong> for
+                authentication and real-time database management. Users can sign
+                up, log in, and participate in multiple chat rooms. Each room
+                allows for continuous conversation, storing messages in the
+                database with accurate timestamps and maintaining chat history.
+              </p>
+              <ul>
+                <li>
+                  <strong>Authentication</strong> using Firebase (sign-in and
+                  sign-up routes).
+                </li>
+                <li>
+                  <strong>Real-time messaging</strong> with dynamic updates as
+                  messages are sent and received.
+                </li>
+                <li>
+                  <strong>Chat rooms and user management</strong> to switch
+                  between conversations.
+                </li>
+              </ul>
+            </section>
+
+            <hr />
+            <section id="three">
+              <h4>What I Learned</h4>
+              <ul>
+                <li>
+                  <strong>React Router:</strong> Gained experience with
+                  navigation between multiple routes.
+                </li>
+                <li>
+                  <strong>State Management with Hooks:</strong> Improved skills
+                  with <code>useState</code>, <code>useEffect</code>, and
+                  <code>useContext</code>.
+                </li>
+                <li>
+                  <strong>Firebase Integration:</strong> Learned how to connect
+                  React to Firebase for authentication and messaging.
+                </li>
+                <li>
+                  <strong>UI Design in React:</strong> Designed a user-friendly
+                  interface with responsive elements.
+                </li>
+              </ul>
+            </section>
+
+            <hr />
+            <section id="four">
+              <h4>Implementing the Chat Application</h4>
+              <h5>Setting Up Routes and Authentication</h5>
+              <pre><code class="language-typescript" style="font-size: small;">
+<script type="text/typescript">
+import React from "react";
+import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AuthContainer from "./components/auth/AuthContainer";
+import MainChat from "./components/chat/MainChat";
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<AuthContainer mode="signin" />} />
+          <Route path="/signup" element={<AuthContainer mode="signup" />} />
+          <Route path="/chat" element={<MainChat />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
+}
+export default App;
+</script>
+            </code></pre>
+
+              <h5>Chat Interface and User Management</h5>
+              <pre><code class="language-typescript" style="font-size: small;">
+<script type="text/typescript">
+const MainChat = () => {
+  const [chats, setChats] = useState([]);
+  const [chat, setChat] = useState(null);
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    navigate("/");
+  };
+
+  return (
+    <div className="flex h-screen">
+      <div className="w-64 bg-gray-200">
+        <div className="chat-list">
+          {chats.map((c) => (
+            <div key={c.id} onClick={() => setChat(c)}>
+              {c.chatName}
+            </div>
+          ))}
+        </div>
+        <button onClick={handleSignOut}>Sign Out</button>
+      </div>
+      <div className="chat-window">
+        {chat && <MessageForm chatId={chat.id} />}
+      </div>
+    </div>
+  );
+};
+export default MainChat;
+</script>
+            </code></pre>
+
+              <h5>Sending Messages and Storing Chat History</h5>
+              <pre><code class="language-typescript" style="font-size: small;">
+<script type="text/typescript">
+const handleMessageSubmit = async (text) => {
+  await addMessageToChat(chat.id, { text, timestamp: Date.now() });
+};
+</script>
+            </code></pre>
+            </section>
+
+            <hr />
+            <section id="five">
+              <h4>Experimentation and Exploration</h4>
+              <ul>
+                <li>
+                  <strong>Group Chat:</strong> Users can join both private and
+                  group chats.
+                </li>
+                <li>
+                  <strong>Presence Detection:</strong> Display "Online" or
+                  "Offline" statuses.
+                </li>
+                <li>
+                  <strong>Dark Mode:</strong> Added a dark mode toggle for
+                  better usability.
+                </li>
+                <li>
+                  <strong>Push Notifications:</strong> Plan to notify users of
+                  new messages.
+                </li>
+              </ul>
+            </section>
+            <hr />
+            <section id="six">
+              <h4>Conclusion</h4>
+              <p>
+                This project was a great learning experience in building chat
+                applications with real-time updates. It provided hands-on
+                practice with <strong>React, Firebase, and hooks</strong>. I'm
+                excited to continue exploring this field by adding more
+                features, like file sharing and notifications.
+              </p>
+              <p>
+                The source code for this project can be found on my
+                <a
+                  href="https://github.com/aidanvidal/Real-Time-Chat-App"
+                  target="_blank"
+                  >GitHub repository</a
+                >.
+              </p>
+              <p>Thanks for reading!</p>
+            </section>
+
+            <hr />
+            <section id="seven">
+              <h4>Posted by: Aidan Vidal</h4>
+              <p>Posted on: October 26, 2024</p>
+            </section>
+          </div>
+        </article>
+      </main>
+
+      <section id="footer">
+        <div class="container">
+          <ul class="copyright">
+            <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="prism.js"></script>
+  </body>
+</html>
