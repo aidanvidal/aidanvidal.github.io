@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Building an AI-Driven RPG Game</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="prism.css" />
+  </head>
+
+  <body class="is-preload">
+    <section id="header">
+      <header>
+        <span class="image avatar"><img src="../images/avatar.jpg" alt="" /></span>
+        <h1 id="logo">Aidan Vidal</h1>
+        <p>
+          A passionate developer with a love for AI and creative projects. This blog covers my latest creation: an AI-powered RPG game.
+        </p>
+      </header>
+      <nav id="nav">
+        <ul>
+          <li><a href="../index.html" class="active">Home</a></li>
+          <li><a href="#two">Project Overview</a></li>
+          <li><a href="#three">How It Works</a></li>
+          <li><a href="#four">Code Highlights</a></li>
+          <li><a href="#five">Conclusion</a></li>
+        </ul>
+      </nav>
+      <footer>
+        <ul class="icons">
+          <li>
+            <a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank">
+              <span class="label">Github</span>
+            </a>
+          </li>
+        </ul>
+      </footer>
+    </section>
+
+    <div id="wrapper">
+      <main class="main">
+        <article class="blog-post">
+          <div class="container">
+            <section id="one">
+              <h2>Building an AI-Driven RPG Game</h2>
+              <p>
+                My latest project combines React, Python, and OpenAI to create a unique RPG experience.
+                It’s an interactive game that blends AI storytelling, character creation, and dynamic gameplay into one immersive package.
+              </p>
+            </section>
+
+            <hr />
+            <section id="two">
+              <h4>Project Overview</h4>
+              <p>
+                The AI-powered RPG game uses a React-based front-end and a Python Flask back-end.
+                It integrates OpenAI's conversational AI to dynamically craft stories, responses, and character interactions. Here are the key features:
+              </p>
+              <ul>
+                <li><strong>Interactive Character Creation:</strong> Players can define their character's traits, and AI generates detailed backstories.</li>
+                <li><strong>Dynamic Storytelling:</strong> AI responds uniquely to every player action, creating an engaging narrative.</li>
+                <li><strong>Persistent Gameplay:</strong> Data is stored in a database, ensuring continuity between sessions.</li>
+              </ul>
+            </section>
+
+            <hr />
+            <section id="three">
+              <h4>How It Works</h4>
+              <ul>
+                <li>
+                  <strong>User Authentication:</strong> Players register with a username, password, and OpenAI API key. This process is handled via Flask.
+                </li>
+                <li>
+                  <strong>AI-Assisted Character Creation:</strong> Player inputs are processed, and OpenAI generates detailed character descriptions.
+                </li>
+                <li>
+                  <strong>Gameplay:</strong> The AI sets the game scene, processes player commands, and responds dynamically, driving the story forward.
+                </li>
+              </ul>
+            </section>
+
+            <hr />
+            <section id="four">
+              <h4>Code Highlights</h4>
+              <h5>Front-End: App.tsx</h5>
+              <p>
+                The React front-end manages navigation and state using <code>React Router</code> and hooks like <code>useState</code> and <code>useEffect</code>. Here's a simplified view of the main structure:
+              </p>
+              <pre><code class="language-javascript">
+                import React from "react";
+                import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+                import PlayerCreation from "./PlayerCreation";
+                import Gameplay from "./Gameplay";
+
+                function App() {
+                  return (
+                    <Router>
+                      <Routes>
+                        <Route path="/create" element={<PlayerCreation />} />
+                        <Route path="/gameplay" element={<Gameplay />} />
+                      </Routes>
+                    </Router>
+                  );
+                }
+                export default App;
+              </code></pre>
+
+              <h5>Back-End: main.py</h5>
+              <p>
+                The Flask back-end manages API routes for authentication, character creation, and game state. It integrates OpenAI's API for AI-driven responses. For example:
+              </p>
+              <pre><code class="language-python">
+                from flask import Flask, request, jsonify
+                from openai import ChatCompletion
+
+                app = Flask(__name__)
+
+                @app.route('/create-player', methods=['POST'])
+                def create_player():
+                    data = request.json
+                    prompt = f"Create a detailed character based on: {data['character_traits']}"
+                    response = ChatCompletion.create(model="gpt-4", prompt=prompt)
+                    return jsonify({"character": response['choices'][0]['text']})
+              </code></pre>
+            </section>
+
+            <hr />
+            <section id="five">
+              <h4>Conclusion</h4>
+              <p>
+                This project has been a fantastic journey into combining AI with gaming. It leverages state-of-the-art technologies to provide a unique player experience.
+                I look forward to enhancing the game with new features like multiplayer capabilities, item systems, and improved storytelling.
+              </p>
+              <p>
+                The source code is available on my
+                <a href="https://github.com/aidanvidal/AI-RPG-Game" target="_blank">GitHub repository</a>.
+              </p>
+            </section>
+
+            <hr />
+            <section id="six">
+              <h4>Posted by: Aidan Vidal</h4>
+              <p>Posted on: January 3, 2025</p>
+            </section>
+          </div>
+        </article>
+      </main>
+
+      <section id="footer">
+        <div class="container">
+          <ul class="copyright">
+            <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+          </ul>
+        </div>
+      </section>
+    </div>
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/jquery.scrollex.min.js"></script>
+    <script src="../assets/js/jquery.scrolly.min.js"></script>
+    <script src="../assets/js/browser.min.js"></script>
+    <script src="../assets/js/breakpoints.min.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../prism.js"></script>
+  </body>
+</html>
