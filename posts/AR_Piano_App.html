@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Making AR Piano Trainer in Unity</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="prism.css" />
+  </head>
+  <body class="is-preload">
+    <section id="header">
+      <header>
+        <span class="image avatar"><img src="../images/avatar.jpg" alt="" /></span>
+        <h1 id="logo">Aidan Vidal</h1>
+        <p>A passionate developer exploring the intersection of AR and music technology.</p>
+      </header>
+      <nav id="nav">
+        <ul>
+          <li><a href="../index.html" class="active">Home</a></li>
+          <li><a href="#two">Project Overview</a></li>
+          <li><a href="#three">How It Works</a></li>
+          <li><a href="#four">Challenges</a></li>
+          <li><a href="#five">Conclusion</a></li>
+        </ul>
+      </nav>
+    </section>
+    <div id="wrapper">
+      <main class="main">
+        <article class="blog-post">
+          <div class="container">
+            <section id="one">
+              <h2>Building an AR Piano Trainer</h2>
+              <p>
+                This Unity-based Augmented Reality (AR) application helps users learn and play songs by visualizing notes in real-time.
+              </p>
+            </section>
+            <hr />
+            <section id="two">
+              <h4>Project Overview</h4>
+              <p>This was my first time working with AR and Unity so there was a lot to learn.
+                I wanted to create an app that would help people learn to play the piano by visualizing notes in AR space, kinda like those <a href="https://www.youtube.com/watch?v=a7vqHDWG8y0" target="_blank">piano tutorial videos</a> on youtube.
+                I have a background in music so I thought this would be a fun project to work on. The AR aspect was really fun and I can see a lot of potential for this kind of technology in the future.
+                I want continue working with it and see what other cool things I can make.
+              </p>
+              <p>The AR Piano Trainer leverages AR Foundation to create an immersive piano learning experience with the following features:</p>
+              <ul>
+                <li><strong>MIDI File Integration:</strong> Extracts song notes and timing.</li>
+                <li><strong>AR Note Visualization:</strong> Displays notes as AR planes that move towards the player.</li>
+                <li><strong>Dynamic Note Timing:</strong> Ensures notes reach the correct position at the right time.</li>
+                <li><strong>Piano Note Mapping:</strong> Maps MIDI notes to their respective AR positions.</li>
+              </ul>
+            </section>
+            <hr />
+            <section id="three">
+              <h4>How It Works</h4>
+              <ul>
+                <li><strong>Load a MIDI File:</strong> The app reads the MIDI file and extracts note data.
+                  I used <a href="https://melanchall.github.io/drywetmidi/index.html" target="_blank">Dry Wet MIDI</a> which is a unity package for reading MIDI files.
+                  It has a lot of cool features for music theory things, but I only used the MIDI file reading part.
+                </li>
+                <li><strong>Map Notes to AR Space:</strong> Each note’s position is calculated based on a virtual piano mapping using an AR anchor as the relative positioning.</li>
+                <li><strong>Spawn AR Note Planes:</strong> Notes appear and move towards the target area.</li>
+                <li><strong>Sync with Song Timing:</strong> Notes arrive at the correct time for the player to hit them.</li>
+              </ul>
+            </section>
+            <hr />
+            <section id="four">
+              <h4>Challenges</h4>
+              <p>
+                One of the main challenges was handling the syncing between the note timing and their location in the AR space.
+                Unity's scaling and positioning system was tricky to get right because the position and scaling system coordinates are at 1:10 ratio.
+                This made calculations for note positions and timings more complex.
+              </p>
+              <p>
+                Another challenge was getting the anchor point correctly set. This was crucial for the AR notes to move towards the player accurately.
+                I had to experiment with different ways to correctly handle this. Eventually, I found a solution that worked well but I'm not too happy with it
+                since it requires a lot of player involvement to setup. The anchor also occasionally drifts or rotates, which can be frustrating for the user but I think I solved the rotation issue.
+              </p>
+            </section>
+            <hr />
+            <section id="five">
+              <h4>Conclusion</h4>
+              <p>
+                This project was really fun to work on and I learned a lot about AR and Unity. I'm excited to see where this technology goes in the future and I'm looking forward to working on more projects like this.
+                As always the best way to learn is to just start building things and see where it takes you and I'm glad I did this project.
+              </p>
+              <p>Check out the source code on my <a href="https://github.com/aidanvidal/AR-Piano-App" target="_blank">GitHub repository</a>.</p>
+            </section>
+            <hr />
+            <section id="six">
+              <h4>Posted by: Aidan Vidal</h4>
+              <p>Posted on: March 8, 2025</p>
+            </section>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script src="../prism.js"></script>
+  </body>
+</html>
