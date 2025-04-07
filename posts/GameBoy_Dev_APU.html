@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Deep Dive: Implementing the Game Boy Audio Processing Unit (APU)</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="prism.css" />
+    <style>
+      .technical-details {
+        background-color: #f5f5f5;
+        border-left: 4px solid #3a7bd5;
+        padding: 1rem;
+        margin: 1rem 0;
+      }
+      .register-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+      }
+      .register-table th, .register-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      .register-table th {
+        background-color: #f2f2f2;
+      }
+      .waveform-diagram {
+        text-align: center;
+        margin: 1.5rem 0;
+      }
+    </style>
+  </head>
+  <body class="is-preload">
+    <section id="header">
+      <header>
+        <span class="image avatar"><img src="../images/avatar.jpg" alt="" /></span>
+        <h1 id="logo">Aidan Vidal</h1>
+        <p>Exploring the intricacies of retro game console emulation</p>
+      </header>
+      <nav id="nav">
+        <ul>
+          <li><a href="../index.html" class="active">Home</a></li>
+          <li><a href="#two">APU Architecture</a></li>
+          <li><a href="#three">Channel Deep Dives</a></li>
+          <li><a href="#four">Audio Pipeline</a></li>
+          <li><a href="#five">Timing Challenges</a></li>
+          <li><a href="#six">Conclusion</a></li>
+        </ul>
+      </nav>
+      <footer>
+        <ul class="icons">
+          <li>
+            <a
+              href="https://github.com/aidanvidal"
+              class="icon brands fa-github"
+              target="_blank"
+              ><span class="label">Github</span></a
+            >
+          </li>
+        </ul>
+      </footer>
+    </section>
+    <div id="wrapper">
+      <main class="main">
+        <article class="blog-post">
+          <div class="container">
+            <section id="one">
+              <h2>Deep Dive: Implementing the Game Boy Audio Processing Unit</h2>
+              <p>
+                A comprehensive exploration of the Game Boy's sound hardware emulation, covering everything from register-level implementation to modern audio pipeline integration.
+              </p>
+            </section>
+            <hr />
+            <section id="two">
+              <h4>APU Architecture and Fundamentals</h4>
+              
+              <div class="technical-details">
+                <p>The Game Boy's APU is a sophisticated piece of hardware for its time, operating at the system's master clock frequency of 4.194304 MHz. Unlike modern audio processors, it generates sound entirely through digital synthesis rather than using samples or advanced DSP.</p>
+                
+                <p>Key architectural features:</p>
+                <ul>
+                  <li><strong>4 Independent Channels:</strong> Each with dedicated registers and unique synthesis methods</li>
+                  <li><strong>Frame Sequencer:</strong> A 512Hz timer that coordinates envelope and length operations</li>
+                  <li><strong>Digital-to-Analog Conversion:</strong> Each channel has its own DAC before mixing</li>
+                  <li><strong>Stereo Panning:</strong> Individual left/right control per channel</li>
+                  <li><strong>Master Control:</strong> NR52 register enables/disables entire APU</li>
+                </ul>
+              </div>
+              
+              <p>The APU's memory map occupies registers from FF10-FF3F, with each channel having specific register allocations:</p>
+              
+              <table class="register-table">
+                <tr>
+                  <th>Channel</th>
+                  <th>Registers</th>
+                  <th>Control Bits</th>
+                </tr>
+                <tr>
+                  <td>Channel 1 (Pulse with Sweep)</td>
+                  <td>FF10-FF14</td>
+                  <td>Sweep, Duty, Volume, Frequency</td>
+                </tr>
+                <tr>
+                  <td>Channel 2 (Pulse)</td>
+                  <td>FF15-FF19</td>
+                  <td>Duty, Volume, Frequency</td>
+                </tr>
+                <tr>
+                  <td>Channel 3 (Wave)</td>
+                  <td>FF1A-FF1E</td>
+                  <td>Enable, Length, Volume, Frequency</td>
+                </tr>
+                <tr>
+                  <td>Channel 4 (Noise)</td>
+                  <td>FF1F-FF23</td>
+                  <td>Length, Volume, Polynomial, Clock</td>
+                </tr>
+                <tr>
+                  <td>Control</td>
+                  <td>FF24-FF26</td>
+                  <td>Volume, Panning, Power</td>
+                </tr>
+              </table>
+              
+              <p>The frame sequencer is particularly interesting - it's a 6-step timer that triggers different events at specific intervals:</p>
+              
+              <ol>
+                <li><strong>Step 1:</strong> Clock length counters</li>
+                <li><strong>Step 2:</strong> Clock length counters</li>
+                <li><strong>Step 3:</strong> Clock length counters + sweep unit</li>
+                <li><strong>Step 4:</strong> Clock length counters</li>
+                <li><strong>Step 5:</strong> Clock length counters</li>
+                <li><strong>Step 6:</strong> Clock length counters + sweep unit</li>
+                <li><strong>Step 7:</strong> Clock length counters + envelope units</li>
+                <li><strong>Step 8:</strong> Clock length counters</li>
+              </ol>
+            </section>
+            <hr />
+            <section id="three">
+              <h4>Channel Implementation Deep Dives</h4>
+              
+              <h5>Channel 1: Pulse Wave with Sweep</h5>
+              
+              <div class="waveform-diagram">
+                <p>Duty Cycle Patterns:</p>
+                <pre>
+12.5%: _-------_-------
+25%:   __------__------
+50%:   ____----____----
+75%:   ______--______--
+                </pre>
+              </div>
+              
+              <p>The sweep unit is one of the most complex parts of Channel 1. It modifies the channel's frequency periodically according to:</p>
+              
+              <pre><code class="language-cpp">void ChannelOne::sweepIteration() {
+  if (getSweepPace() == 0 || !isEnabled()) return;
+  
+  state.sweepTimer--;
+  if (state.sweepTimer <= 0) {
+    state.sweepTimer = getSweepPace();
+    int period = getPeriod();
+    int shift = getSweepStep();
+    
+    if (getSweepDirection()) {
+      // Increasing frequency
+      int newPeriod = period + (period / (1 << shift));
+      if (newPeriod > 2047) {
+        setEnabled(false); // Overflow disables channel
+      } else {
+        setPeriod(newPeriod);
+      }
+    } else {
+      // Decreasing frequency
+      int newPeriod = period - (period / (1 << shift));
+      if (newPeriod >= 0) {
+        setPeriod(newPeriod);
+      }
+    }
+  }
+}</code></pre>
+              
+              <p>The envelope generator has its own timer running at 64Hz (triggered by the frame sequencer):</p>
+              
+              <pre><code class="language-cpp">void ChannelOne::updateEnvelope() {
+  if (state.envelopePeriod == 0) return;
+  
+  state.envelopeTimer--;
+  if (state.envelopeTimer <= 0) {
+    state.envelopeTimer = state.envelopePeriod;
+    if (state.envelopeDirection && state.volume < 15) {
+      state.volume++;
+    } else if (!state.envelopeDirection && state.volume > 0) {
+      state.volume--;
+    }
+  }
+}</code></pre>
+              
+              <h5>Channel 3: Wave Pattern Generator</h5>
+              
+              <p>The wave channel is unique in that it plays back user-defined 4-bit samples from its 32-byte wave RAM (16 samples × 4 bits each). The sample playback timing is calculated as:</p>
+              
+              <pre><code class="language-cpp">void ChannelThree::updateSampleTimer(int cycles) {
+  if (!isEnabled()) return;
+  
+  state.sampleTimer -= cycles;
+  if (state.sampleTimer <= 0) {
+    // 4MHz clock divided by (2048 - period)*2
+    state.sampleTimer = (2048 - getPeriod()) * 2;
+    state.sampleSelection = (state.sampleSelection + 1) % 32;
+    
+    // Get 4-bit sample (alternating upper/lower nibbles)
+    bool upperNibble = (state.sampleSelection % 2 == 0);
+    int ramIndex = state.sampleSelection / 2;
+    state.sampleBuffer = getNibbleWavePatternRAM(ramIndex, upperNibble);
+  }
+}</code></pre>
+              
+              <p>The wave channel's volume control is implemented through bit shifting:</p>
+              
+              <pre><code class="language-cpp">float ChannelThree::getSample() {
+  if (!state.dacEnabled) return 0.0f;
+  
+  int sample = state.sampleBuffer;
+  switch (getOutputLevel()) {
+    case 0: return 0.0f;       // Mute
+    case 1: return sample;     // 100%
+    case 2: return sample >> 1; // 50%
+    case 3: return sample >> 2; // 25%
+    default: return 0.0f;
+  }
+}</code></pre>
+              
+              <h5>Channel 4: Noise Generator</h5>
+              
+              <p>The noise channel uses a 15-bit or 7-bit linear feedback shift register (LFSR) for pseudo-random noise generation. The LFSR is clocked at:</p>
+              
+              <p>f = 524288 Hz / r / 2^(s+1)</p>
+              <p>Where r is the divider (0 treated as 0.5) and s is the clock shift</p>
+              
+              <pre><code class="language-cpp">void ChannelFour::updateLFSR(int cycles) {
+  state.lfsrTimer -= cycles;
+  if (state.lfsrTimer <= 0) {
+    // Reset timer based on current parameters
+    state.lfsrTimer = (16 * (getClockDivider() == 0 ? 0.5 : getClockDivider()) 
+                      * (1 << getClockShift()));
+    
+    // XOR bits 0 and 1
+    bool xorResult = ((state.lfsr & 1) ^ ((state.lfsr >> 1) & 1));
+    
+    if (state.lfsrWidth) {
+      // 7-bit mode: XOR result goes to bit 6
+      state.lfsr = (state.lfsr >> 1) | (xorResult << 6);
+    } else {
+      // 15-bit mode: XOR result goes to bit 14
+      state.lfsr = (state.lfsr >> 1) | (xorResult << 14);
+    }
+  }
+}</code></pre>
+            </section>
+            <hr />
+            <section id="four">
+              <h4>Modern Audio Pipeline Implementation</h4>
+              
+              <p>The SDL audio backend was implemented with several considerations:</p>
+              
+              <div class="technical-details">
+                <p><strong>Buffer Management:</strong> Using a ring buffer to handle the mismatch between the emulation's sample generation rate (variable) and SDL's consumption rate (fixed 44.1kHz).</p>
+                
+                <p><strong>Mixing Pipeline:</strong></p>
+                <ol>
+                  <li>Each channel generates a sample (0-15 scale)</li>
+                  <li>Samples are normalized to 0.0-1.0 range</li>
+                  <li>Panning is applied based on NR51</li>
+                  <li>Master volume (NR50) scales final output</li>
+                  <li>Mixed samples are converted to 32-bit float</li>
+                </ol>
+              </div>
+              
+              <pre><code class="language-cpp">void APU::getAudioSample() {
+  if (!APUEnabled) return;
+
+  // Get samples from all channels
+  float samples[4] = {
+    channelOne.getSample() / 15.0f,
+    channelTwo.getSample() / 15.0f,
+    channelThree.getSample() / 15.0f,
+    channelFour.getSample() / 15.0f
+  };
+
+  // Apply panning and volume
+  float left = 0.0f, right = 0.0f;
+  BYTE volLeft, volRight;
+  getVolumeLevel(volLeft, volRight);
+  
+  for (int i = 0; i < 4; i++) {
+    bool leftEnable, rightEnable;
+    getChannelPanning(i+1, leftEnable, rightEnable);
+    
+    if (leftEnable) left += samples[i];
+    if (rightEnable) right += samples[i];
+  }
+
+  // Apply master volume (0-7 to 0-128 scale)
+  left *= (volLeft * 128 / 7);
+  right *= (volRight * 128 / 7);
+
+  // Add to buffer
+  buffer[bufferFill++] = left;
+  buffer[bufferFill++] = right;
+
+  // Submit to SDL when buffer full
+  if (bufferFill >= SAMPLE_BUFFER_SIZE) {
+    SDL_QueueAudio(1, buffer, bufferFill * sizeof(float));
+    bufferFill = 0;
+  }
+}</code></pre>
+              
+              <p>The audio timing is synchronized with CPU execution by counting cycles between samples:</p>
+              
+              <pre><code class="language-cpp">const double CPU_FREQ = 4194304.0; // 4.194304 MHz
+const double SAMPLE_RATE = 44100.0;
+const int CYCLES_PER_SAMPLE = static_cast<int>(CPU_FREQ / SAMPLE_RATE);
+
+int cyclesAccumulated = 0;
+
+void cpuUpdate(int cycles) {
+  cyclesAccumulated += cycles;
+  
+  while (cyclesAccumulated >= CYCLES_PER_SAMPLE) {
+    apu.generateSample();
+    cyclesAccumulated -= CYCLES_PER_SAMPLE;
+  }
+}</code></pre>
+            </section>
+            <hr />
+            <section id="five">
+              <h4>Timing Challenges and Solutions</h4>
+              
+              <p>Precise timing was one of the biggest challenges in the implementation. Some specific issues encountered:</p>
+              
+              <h5>Frame Sequencer Synchronization</h5>
+              <p>The 512Hz frame sequencer must remain perfectly synchronized with CPU execution despite running at a different rate. The solution was to implement it as a cycle counter:</p>
+              
+              <pre><code class="language-cpp">void APU::apuStep() {
+  static int cyclesRemaining = 8192; // 4MHz / 512Hz
+  
+  cyclesRemaining -= cycles;
+  if (cyclesRemaining <= 0) {
+    // Process current step
+    processFrameSequencerStep();
+    cyclesRemaining += 8192;
+  }
+}</code></pre>
+              
+              <h5>Channel Frequency Precision</h5>
+              <p>Each channel's frequency is controlled by an 11-bit period value (0-2047) that determines how often the waveform advances. The actual frequency is calculated as:</p>
+              
+              <p>f = 131072 / (2048 - period)</p>
+              
+              <p>This requires careful handling of the timer wraparound to avoid artifacts:</p>
+              
+              <pre><code class="language-cpp">void ChannelTwo::updateSequenceTimer(int cycles) {
+  state.timer -= cycles;
+  while (state.timer <= 0) {
+    state.timer += (2048 - getPeriod()) * 4;
+    state.sequencePointer = (state.sequencePointer + 1) % 8;
+  }
+}</code></pre>
+              
+              <h5>Wave Channel Sample Timing</h5>
+              <p>The wave channel's sample timing is particularly sensitive because it needs to:</p>
+              <ol>
+                <li>Switch between samples at precisely the right moment</li>
+                <li>Alternate between upper and lower nibbles</li>
+                <li>Handle the double-rate timing (period × 2 compared to other channels)</li>
+              </ol>
+            </section>
+            <hr />
+            <section id="six">
+              <h4>Conclusion</h4>
+              
+              <p>Implementing the Game Boy APU has been an incredibly educational experience in both retro hardware architecture and audio programming. Some key takeaways:</p>
+              
+              <ul>
+                <li>The importance of cycle-accurate timing in faithful emulation</li>
+                <li>How simple digital synthesis can create rich soundscapes</li>
+                <li>The challenges of bridging vintage hardware designs with modern audio APIs</li>
+              </ul>
+              
+              <p>Now that the APU is done, it is time to move on to the next part. I think I will tackle timers and interrupts next. Probably no post about
+                that since it is not as interesting as the APU, but do definitly expect one for the Graphics (GPU) and Cartridge system because those look really interesting.</p>
+              </p>
+                            
+              <p>The complete source code is available on <a href="https://github.com/aidanvidal/Game-Boy-Emulator/tree/main/APU" target="_blank">GitHub</a>.</p>
+              <p>Check out <a href="https://gbdev.io/pandocs/Audio_details.html" target="_blank">Pan Docs</a> for great documentation on Game Boy hardware.</p>
+            </section>
+            <hr />
+            <section id="eight">
+              <h4>Posted by: Aidan Vidal</h4>
+              <p>Posted on: April 7, 2025</p>
+            </section>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script src="../prism.js"></script>
+  </body>
+</html>
