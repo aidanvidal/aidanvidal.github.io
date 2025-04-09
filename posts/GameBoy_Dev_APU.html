@@ -45,7 +45,7 @@
           <li><a href="#two">APU Architecture</a></li>
           <li><a href="#three">Channel Deep Dives</a></li>
           <li><a href="#four">Audio Pipeline</a></li>
-          <li><a href="#five">Timing Challenges</a></li>
+          <li><a href="#five">Challenges</a></li>
           <li><a href="#six">Conclusion</a></li>
         </ul>
       </nav>
@@ -70,6 +70,11 @@
               <h2>Deep Dive: Implementing the Game Boy Audio Processing Unit</h2>
               <p>
                 A comprehensive exploration of the Game Boy's sound hardware emulation, covering everything from register-level implementation to modern audio pipeline integration.
+              </p>
+              <p>
+                This will be the first in a series that will follow my implementation of a Game Boy emulator in C++. I have very little prior experience with building an emulator, I have only
+                built a Chip8 emulator before, so I am learning a lot as I go. I will be documenting my progress and sharing the code as I go along. This post will focus on the audio processing unit (APU) of the 
+                Game Boy. I started with the APU first because I heard it was the most complex part of the system and I wanted to get it out of the way first. I also thought it would be a good way to learn about digital audio synthesis and how to implement it in C++.
               </p>
             </section>
             <hr />
@@ -111,6 +116,8 @@
                   <td>Channel 3 (Wave)</td>
                   <td>FF1A-FF1E</td>
                   <td>Enable, Length, Volume, Frequency</td>
+                  <td>FF30-FF3F</td>
+                  <td>Wave Pattern RAM</td>
                 </tr>
                 <tr>
                   <td>Channel 4 (Noise)</td>
@@ -124,18 +131,16 @@
                 </tr>
               </table>
               
-              <p>The frame sequencer is particularly interesting - it's a 6-step timer that triggers different events at specific intervals:</p>
-              
-              <ol>
-                <li><strong>Step 1:</strong> Clock length counters</li>
-                <li><strong>Step 2:</strong> Clock length counters</li>
-                <li><strong>Step 3:</strong> Clock length counters + sweep unit</li>
-                <li><strong>Step 4:</strong> Clock length counters</li>
-                <li><strong>Step 5:</strong> Clock length counters</li>
-                <li><strong>Step 6:</strong> Clock length counters + sweep unit</li>
-                <li><strong>Step 7:</strong> Clock length counters + envelope units</li>
-                <li><strong>Step 8:</strong> Clock length counters</li>
-              </ol>
+              <p>The frame sequencer is particularly interesting - it's a 8-step timer clocked at 512Hz that triggers different events at specific intervals:</p>
+              <ul>
+                <li>Step 0: Length</li>
+                <li>Step 1: Nothing</li>
+                <li>Step 2: Length</li>
+                <li>Step 3: Sweep</li>
+                <li>Step 4: Length</li>
+                <li>Step 5: Nothing</li>
+                <li>Step 6: Length</li>
+                <li>Step 7: Envelope and Sweep</li>              
             </section>
             <hr />
             <section id="three">
@@ -153,7 +158,9 @@
                 </pre>
               </div>
               
-              <p>The sweep unit is one of the most complex parts of Channel 1. It modifies the channel's frequency periodically according to:</p>
+              <p>The sweep unit is one of the most complex parts of Channel 1. It modifies the channel's frequency periodically according to 
+                a sweep period, direction, and pace (steps per clocked cycle) set in the NR10 register. The sweep unit is clocked at 128Hz.</p>
+              </p>
               
               <pre><code class="language-cpp">void ChannelOne::sweepIteration() {
   if (getSweepPace() == 0 || !isEnabled()) return;
@@ -182,7 +189,9 @@
   }
 }</code></pre>
               
-              <p>The envelope generator has its own timer running at 64Hz (triggered by the frame sequencer):</p>
+              <p>The envelope generator has is clocked at 64Hz (triggered by the frame sequencer) and controls 
+                the volume of the channel. The envelope period is set in the NR12 register and can be set to 0 to disable it.</p>
+              </p>
               
               <pre><code class="language-cpp">void ChannelOne::updateEnvelope() {
   if (state.envelopePeriod == 0) return;
@@ -198,9 +207,11 @@
   }
 }</code></pre>
               
+              <p>Channel 2 is exactly the same as channel 1 but without the sweep functionality, and thus no equivalent to NR10 register.</p>
+
               <h5>Channel 3: Wave Pattern Generator</h5>
               
-              <p>The wave channel is unique in that it plays back user-defined 4-bit samples from its 32-byte wave RAM (16 samples × 4 bits each). The sample playback timing is calculated as:</p>
+              <p>The wave channel is unique in that it plays back user-defined 4-bit samples from its 16-byte wave RAM (32 samples × 4 bits each). The sample playback timing is calculated as:</p>
               
               <pre><code class="language-cpp">void ChannelThree::updateSampleTimer(int cycles) {
   if (!isEnabled()) return;
@@ -262,121 +273,96 @@
             </section>
             <hr />
             <section id="four">
-              <h4>Modern Audio Pipeline Implementation</h4>
+              <h4>SDL Audio Backend Implementation</h4>
               
-              <p>The SDL audio backend was implemented with several considerations:</p>
+              <p>The SDL audio implementation bridges the gap between the Game Boy's digital audio synthesis and modern operating system audio APIs. Key implementation details include:</p>
               
               <div class="technical-details">
-                <p><strong>Buffer Management:</strong> Using a ring buffer to handle the mismatch between the emulation's sample generation rate (variable) and SDL's consumption rate (fixed 44.1kHz).</p>
-                
-                <p><strong>Mixing Pipeline:</strong></p>
-                <ol>
-                  <li>Each channel generates a sample (0-15 scale)</li>
-                  <li>Samples are normalized to 0.0-1.0 range</li>
-                  <li>Panning is applied based on NR51</li>
-                  <li>Master volume (NR50) scales final output</li>
-                  <li>Mixed samples are converted to 32-bit float</li>
-                </ol>
+                <p><strong>Initialization and Configuration:</strong></p>
+                <pre><code class="language-cpp">APU::APU() {
+  SDL_AudioSpec audioSpec;
+  audioSpec.freq = 44100;         // CD-quality sample rate
+  audioSpec.format = AUDIO_F32SYS; // 32-bit float samples
+  audioSpec.channels = 2;         // Stereo output
+  audioSpec.samples = 4096;       // Buffer size
+  audioSpec.callback = NULL;      // Using push architecture
+  SDL_OpenAudio(&audioSpec, &obtainedSpec);
+}</code></pre>
+
+                <p><strong>Key Design Decisions:</strong></p>
+                <ul>
+                  <li>Float32 format preserves dynamic range during mixing</li>
+                  <li>Stereo panning through NR51 register bitmask processing</li>
+                  <li>Asynchronous queued audio to prevent buffer underruns</li>
+                </ul>
               </div>
+
+              <p>The audio mixing pipeline follows this sequence:</p>
+              <ol>
+                <li>Normalize each channel's 4-bit output to 0.0-1.0 range</li>
+                <li>Apply per-channel panning from NR51 register</li>
+                <li>Sum contributions for left/right channels</li>
+                <li>Apply master volume scaling from NR50 register</li>
+              </ol>
+
+              <pre><code class="language-cpp">// Simplified mixing implementation
+void APU::getAudioSample() {
+  // Sum normalized channel contributions
+  float left = (ch1 * panLeft[0] + ch2 * panLeft[1] + 
+              ch3 * panLeft[2] + ch4 * panLeft[3]) / 15.0f;
               
-              <pre><code class="language-cpp">void APU::getAudioSample() {
-  if (!APUEnabled) return;
+  float right = (ch1 * panRight[0] + ch2 * panRight[1] + 
+               ch3 * panRight[2] + ch4 * panRight[3]) / 15.0f;
 
-  // Get samples from all channels
-  float samples[4] = {
-    channelOne.getSample() / 15.0f,
-    channelTwo.getSample() / 15.0f,
-    channelThree.getSample() / 15.0f,
-    channelFour.getSample() / 15.0f
-  };
+  // Apply master volume (NR50)
+  left *= (volLeft / 7.0f);
+  right *= (volRight / 7.0f);
 
-  // Apply panning and volume
-  float left = 0.0f, right = 0.0f;
-  BYTE volLeft, volRight;
-  getVolumeLevel(volLeft, volRight);
-  
-  for (int i = 0; i < 4; i++) {
-    bool leftEnable, rightEnable;
-    getChannelPanning(i+1, leftEnable, rightEnable);
-    
-    if (leftEnable) left += samples[i];
-    if (rightEnable) right += samples[i];
-  }
-
-  // Apply master volume (0-7 to 0-128 scale)
-  left *= (volLeft * 128 / 7);
-  right *= (volRight * 128 / 7);
-
-  // Add to buffer
+  // Queue to SDL buffer
   buffer[bufferFill++] = left;
   buffer[bufferFill++] = right;
-
-  // Submit to SDL when buffer full
-  if (bufferFill >= SAMPLE_BUFFER_SIZE) {
-    SDL_QueueAudio(1, buffer, bufferFill * sizeof(float));
-    bufferFill = 0;
-  }
 }</code></pre>
-              
-              <p>The audio timing is synchronized with CPU execution by counting cycles between samples:</p>
-              
-              <pre><code class="language-cpp">const double CPU_FREQ = 4194304.0; // 4.194304 MHz
-const double SAMPLE_RATE = 44100.0;
-const int CYCLES_PER_SAMPLE = static_cast<int>(CPU_FREQ / SAMPLE_RATE);
 
-int cyclesAccumulated = 0;
+              <h5>Synchronization Challenges</h5>
+              <p>The implementation must balance:</p>
+              <ul>
+                <li>Game Boy's 4.19MHz clock domain</li>
+                <li>SDL's fixed 44.1kHz sample rate</li>
+                <li>Real-time audio buffer maintenance</li>
+              </ul>
 
-void cpuUpdate(int cycles) {
+              <p>This is solved using cycle-counting with overflow handling:</p>
+              <pre><code class="language-cpp">void cpuUpdate(int cycles) {
   cyclesAccumulated += cycles;
-  
   while (cyclesAccumulated >= CYCLES_PER_SAMPLE) {
     apu.generateSample();
     cyclesAccumulated -= CYCLES_PER_SAMPLE;
   }
 }</code></pre>
+
+              <div class="technical-details">
+                <p><strong>Buffer Management Strategy:</strong></p>
+                <ul>
+                  <li>Double-buffering to prevent audio glitches</li>
+                  <li>Non-blocking SDL_QueueAudio() calls</li>
+                  <li>Automatic sample rate adaptation through cycle counting</li>
+                </ul>
+              </div>
             </section>
+
             <hr />
             <section id="five">
-              <h4>Timing Challenges and Solutions</h4>
-              
-              <p>Precise timing was one of the biggest challenges in the implementation. Some specific issues encountered:</p>
-              
-              <h5>Frame Sequencer Synchronization</h5>
-              <p>The 512Hz frame sequencer must remain perfectly synchronized with CPU execution despite running at a different rate. The solution was to implement it as a cycle counter:</p>
-              
-              <pre><code class="language-cpp">void APU::apuStep() {
-  static int cyclesRemaining = 8192; // 4MHz / 512Hz
-  
-  cyclesRemaining -= cycles;
-  if (cyclesRemaining <= 0) {
-    // Process current step
-    processFrameSequencerStep();
-    cyclesRemaining += 8192;
-  }
-}</code></pre>
-              
-              <h5>Channel Frequency Precision</h5>
-              <p>Each channel's frequency is controlled by an 11-bit period value (0-2047) that determines how often the waveform advances. The actual frequency is calculated as:</p>
-              
-              <p>f = 131072 / (2048 - period)</p>
-              
-              <p>This requires careful handling of the timer wraparound to avoid artifacts:</p>
-              
-              <pre><code class="language-cpp">void ChannelTwo::updateSequenceTimer(int cycles) {
-  state.timer -= cycles;
-  while (state.timer <= 0) {
-    state.timer += (2048 - getPeriod()) * 4;
-    state.sequencePointer = (state.sequencePointer + 1) % 8;
-  }
-}</code></pre>
-              
-              <h5>Wave Channel Sample Timing</h5>
-              <p>The wave channel's sample timing is particularly sensitive because it needs to:</p>
-              <ol>
-                <li>Switch between samples at precisely the right moment</li>
-                <li>Alternate between upper and lower nibbles</li>
-                <li>Handle the double-rate timing (period × 2 compared to other channels)</li>
-              </ol>
+              <h4>Challenges</h4>
+              <p>The hardest aspect of this was just trying to understand how everything fit together. Since I had not worked on many emulators in the past, understanding where
+                each channel and timing fit in the grand scheme of things was challenging for me. Eventually I got it all working, but it took a lot of trial and error to get there as well as 
+                reading of manuals and documentation (Thanks Pan Docs!).
+              </p>
+              <p>One particular thing that stood out was with the channel 3 tone frequency. Since the channel 3's channel frequency was faster than channel 1 and 2, but had a longer waveform cycle, channel 3 
+                should have produced a lower tone frequency than channel 1 and 2. However, when I first tested it, I found that channel 3 was producing a higher tone frequency than channel 1 and 2. After some debugging, 
+                I found that I misunderstood what the waveform cycle was. The waveform cycle I was testing channel 3 with was actually only 1/4 of the proper cycles length (32), thus leading to a higher tone frequency than expected.
+                After correcting this mistake, I was able to get the proper channel 3 tone frequency. This bug was very frustrating to track down since it was not in my implementation but rather my testing that was wrong. I think I lost a
+                day to this bug, but it was a good learning experience for me. I learned that testing is just as important as implementation and that you should always double check your tests to make sure they are correct.
+              </p>
             </section>
             <hr />
             <section id="six">
