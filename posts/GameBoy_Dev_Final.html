@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Deep Dive: Game Boy CPU & Cartridge Implementation</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="prism.css" />
+    <style>
+      .technical-details {
+        background-color: #f5f5f5;
+        border-left: 4px solid #3a7bd5;
+        padding: 1rem;
+        margin: 1rem 0;
+      }
+    </style>
+  </head>
+  <body class="is-preload">
+    <section id="header">
+      <header>
+        <span class="image avatar"
+          ><img src="../images/avatar.jpg" alt=""
+        /></span>
+        <h1 id="logo">Aidan Vidal</h1>
+        <p>Exploring the intricacies of retro game console emulation</p>
+      </header>
+      <nav id="nav">
+        <ul>
+          <li><a href="../index.html" class="active">Home</a></li>
+          <li><a href="#two">CPU Architecture</a></li>
+          <li><a href="#three">Cartridge Logic</a></li>
+          <li><a href="#four">Bugs & Challenges</a></li>
+          <li><a href="#five">Conclusion</a></li>
+        </ul>
+      </nav>
+      <footer>
+        <ul class="icons">
+          <li>
+            <a
+              href="https://github.com/aidanvidal"
+              class="icon brands fa-github"
+              target="_blank"
+              ><span class="label">Github</span></a
+            >
+          </li>
+        </ul>
+      </footer>
+    </section>
+    <div id="wrapper">
+      <main class="main">
+        <article class="blog-post">
+          <div class="container">
+            <section id="one">
+              <h2>Deep Dive: Game Boy CPU and Cartridge Emulation</h2>
+              <p>
+                Following the GPU implementation, I tackled the heart of the
+                Game Boy: its Sharp LR35902 CPU (called the DMG-CPU by nintendo)
+                and the Memory Bank Controller (MBC) systems that define
+                cartridge behavior. This post explores the CPU's architecture,
+                cartridge mapping intricacies, and the trials of aligning
+                hardware quirks with modern emulation.
+              </p>
+            </section>
+            <hr />
+            <section id="two">
+              <h4>CPU Architecture and Registers</h4>
+              <div class="technical-details">
+                <p>
+                  The LR35902 is a hybrid of the Z80 and Intel 8080, operating
+                  at 4.19 MHz. Key registers include:
+                </p>
+                <ul>
+                  <li>
+                    <strong>8-bit General Purpose:</strong> A, F, B, C, D, E, H,
+                    L.
+                  </li>
+                  <li>
+                    <strong>16-bit Special:</strong> SP (Stack Pointer), PC
+                    (Program Counter).
+                  </li>
+                  <li>
+                    <strong>Flags (F Register):</strong> Zero (Z), Carry (C),
+                    Half-Carry (H), Subtract (N).
+                  </li>
+                </ul>
+              </div>
+              <p>
+                The CPU executes instructions in machine cycles, with each cycle
+                tied to the system clock. Common operations include:
+              </p>
+              <ul>
+                <li>
+                  <strong>LD:</strong> Load values between registers or memory.
+                </li>
+                <li>
+                  <strong>ADD/ADC:</strong> Arithmetic operations with and
+                  without carry.
+                </li>
+                <li>
+                  <strong>JP/CALL:</strong> Control flow via absolute addresses.
+                </li>
+                <li>
+                  <strong>PUSH/POP:</strong> Stack manipulation for 16-bit
+                  values.
+                </li>
+              </ul>
+              <p>
+                Interrupt handling was particularly nuanced, with VBlank, LCD
+                STAT, Timer, and Joypad interrupts requiring precise timing to
+                avoid missed frames or input lag.
+              </p>
+            </section>
+            <hr />
+            <section id="three">
+              <h4>Cartridge Logic and MBC Breakdown</h4>
+              <p>
+                Cartridges determine how ROM and RAM are mapped into the Game
+                Boy's memory. Memory Bank Controllers (MBCs) extend the limited
+                address space by banking ROM/RAM dynamically.
+              </p>
+
+              <div class="technical-details">
+                <h5>No-MBC (ROM ONLY)</h5>
+                <p><strong>Used by:</strong> <em>Tetris, Dr. Mario</em></p>
+                <p>
+                  <strong>ROM Limit:</strong> 32KB<br />
+                  <strong>RAM:</strong> None or fixed 8KB (0xA000–0xBFFF)
+                </p>
+                <p>
+                  These simple cartridges have no banking logic. ROM is mapped
+                  directly to 0x0000–0x7FFF. If RAM is present, it's always
+                  accessible at 0xA000–0xBFFF with no need to enable or bank it.
+                </p>
+              </div>
+
+              <div class="technical-details">
+                <h5>MBC1</h5>
+                <p>
+                  <strong>Used by:</strong>
+                  <em>Super Mario Land 2, Final Fantasy Adventure</em>
+                </p>
+                <p>
+                  <strong>Max ROM:</strong> 2MB (128 banks)<br />
+                  <strong>Max RAM:</strong> 32KB (4 banks)
+                </p>
+                <p><strong>Registers:</strong></p>
+                <ul>
+                  <li>
+                    <code>0x0000–0x1FFF</code>: RAM Enable (write 0x0A to
+                    enable, anything else disables)
+                  </li>
+                  <li>
+                    <code>0x2000–0x3FFF</code>: Lower 5 bits of ROM bank number
+                    (bank 0 is not selectable here)
+                  </li>
+                  <li>
+                    <code>0x4000–0x5FFF</code>: RAM bank number or upper bits of
+                    ROM bank (depending on mode)
+                  </li>
+                  <li>
+                    <code>0x6000–0x7FFF</code>: Banking mode (0 = ROM banking, 1
+                    = RAM banking)
+                  </li>
+                </ul>
+                <p>
+                  In ROM banking mode, only ROM is switchable. In RAM banking
+                  mode, you can switch between 4 banks of RAM at 0xA000–0xBFFF.
+                  Switching to ROM bank 0 results in bank 1 due to hardware
+                  constraints.
+                </p>
+              </div>
+
+              <div class="technical-details">
+                <h5>MBC3 + RTC</h5>
+                <p>
+                  <strong>Used by:</strong>
+                  <em>Pokémon Gold/Silver/Crystal, Harvest Moon</em>
+                </p>
+                <p>
+                  <strong>Max ROM:</strong> 2MB<br />
+                  <strong>Max RAM:</strong> 32KB<br />
+                  <strong>Extra:</strong> Real-Time Clock (RTC)
+                </p>
+                <p><strong>Registers:</strong></p>
+                <ul>
+                  <li><code>0x0000–0x1FFF</code>: RAM and RTC Enable</li>
+                  <li>
+                    <code>0x2000–0x3FFF</code>: ROM Bank select (7 bits, up to
+                    128 banks)
+                  </li>
+                  <li>
+                    <code>0x4000–0x5FFF</code>: RAM Bank (0–3) or RTC Register
+                    Select (0x08–0x0C)
+                  </li>
+                  <li>
+                    <code>0x6000–0x7FFF</code>: Latch Clock Data (write 0x00
+                    then 0x01)
+                  </li>
+                </ul>
+                <p>
+                  The RTC provides real-time seconds, minutes, hours, and day
+                  counters. To read consistent values, a latch sequence must be
+                  performed. This emulation is tricky due to the need to
+                  simulate real-world time accurately and persist state across
+                  emulator sessions.
+                </p>
+              </div>
+
+              <div class="technical-details">
+                <h5>MBC5</h5>
+                <p>
+                  <strong>Used by:</strong>
+                  <em>Pokémon Crystal (Rev 1), Wario Land II, Cannon Fodder</em>
+                </p>
+                <p>
+                  <strong>Max ROM:</strong> 8MB (512 banks)<br />
+                  <strong>Max RAM:</strong> 128KB (16 banks)
+                </p>
+                <p><strong>Registers:</strong></p>
+                <ul>
+                  <li><code>0x0000–0x1FFF</code>: RAM Enable</li>
+                  <li><code>0x2000–0x2FFF</code>: Lower 8 bits of ROM bank</li>
+                  <li><code>0x3000–0x3FFF</code>: 9th ROM bank bit (bit 8)</li>
+                  <li><code>0x4000–0x5FFF</code>: RAM Bank select (0–15)</li>
+                </ul>
+                <p>
+                  MBC5 simplifies ROM banking: it supports a full 9-bit ROM bank
+                  number across two registers, avoiding the weird bank-0 quirks
+                  of MBC1. It's common in late-generation titles due to its
+                  large capacity and cleaner implementation. It also supports
+                  rumble but the emulator doesn't implement this feature because
+                  most we do not have the hardware neccessary for it.
+                </p>
+              </div>
+
+              <p>
+                Bank switching is triggered by writing to designated memory
+                regions. Timing and value masking are critical. For example,
+                failing to mask the 9-bit ROM bank in MBC5 can result in
+                undefined behavior or corrupted memory access.
+              </p>
+              <p>
+                Many MBC modes have a battery-backed state for saving and loading a game. This is done by writing to the RAM region
+                and then saving the state to a file. It sounds intimidating at first but it is actually quite simple. The emulator
+                will save the state to a file when the game is closed and load it when the game is opened, done.
+              </p>
+            </section>
+            <hr />
+            <section id="four">
+              <h4>Bugs & Challenges</h4>
+              <p>
+                The most anoying part of this project was debugging the "final"
+                tests. I spent days trying to figure out why ROMS like
+                <em>Link's Awakening</em> would crash or not load. I thought
+                initially that is was a problem with my MBC implementation but
+                it turned out to be a problem with the memory controller. I had
+                not implemented the writes to the cartridge ram yet. This was a
+                simple fix but it took me a while to figure out.
+              </p>
+              <p>
+                After the issue was resolved, I was able to run the game and see
+                that the graphics were not rendering properly. It looked like a
+                frame rate issue, so I started looking into the GPU and main
+                emulation loop. I found that the GPU was not rendering the
+                graphics properly because I had some sprite finding issues. It
+                was not in the correct spot in the GPU cycle which caused things
+                to load slowly and skip frames. This was again a simple fix but
+                also took me a while to figure out.
+              </p>
+              <p>
+                The most anoying bug was by far the initial one I had to deal
+                with. When trying to test NoMBC cartridges (since they were the
+                first ones I implemented), the ROMS would just show a white
+                screen. I knew this had to be an issue with the GPU but I could
+                not figure out what was going on. After a long day of debugging,
+                I found that my variables were unsigned when they should have
+                been signed, they were also too small ints and were overflowing.
+                This was such a simple fix but yet not obvious at all.
+              </p>
+            </section>
+            <hr />
+            <section id="five">
+              <h4>Conclusion</h4>
+              <p>
+                That wraps up the Game Boy emulator project. From figuring out
+                undocumented CPU quirks to getting MBC1 ROM/RAM banking working,
+                this whole thing was a mix of reverse engineering, trial and
+                error, and way too many hours reading technical docs.
+              </p>
+              <p>
+                It wasn’t always fun — debugging silent white screens or chasing
+                down timing bugs can get pretty frustrating — but finally seeing
+                games boot and run properly made it all worth it. It’s been cool
+                getting to understand how all the parts of the system fit
+                together, from the boot ROM to the PPU to the APU.
+              </p>
+              <p>
+                I learned a lot, especially about low-level programming,
+                hardware timing, and just how weird old consoles can be.
+              </p>
+              <p>
+                If you’re thinking about writing an emulator, give it a shot.
+                You’ll learn more than you expect.
+              </p>
+              <p>
+                The full implementation is available on
+                <a
+                  href="https://github.com/aidanvidal/Game-Boy-Emulator"
+                  target="_blank"
+                  >GitHub</a
+                >. Special thanks to the
+                <a href="https://gbdev.io/pandocs/" target="_blank">Pan Docs</a>
+                community for their invaluable resources.
+              </p>
+            </section>
+            <hr />
+            <section id="six">
+              <h4>Posted by: Aidan Vidal</h4>
+              <p>Posted on: May 3, 2025</p>
+            </section>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script src="../prism.js"></script>
+  </body>
+</html>
