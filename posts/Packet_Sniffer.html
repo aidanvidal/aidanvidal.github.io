@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Building a Packet Sniffer from Scratch with libpcap</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="prism.css" />
+    <style>
+      .technical-details {
+        background-color: #f5f5f5;
+        border-left: 4px solid #3a7bd5;
+        padding: 1rem;
+        margin: 1rem 0;
+      }
+    </style>
+  </head>
+  <body class="is-preload">
+    <section id="header">
+      <header>
+        <span class="image avatar"
+          ><img src="../images/avatar.jpg" alt=""
+        /></span>
+        <h1 id="logo">Aidan Vidal</h1>
+        <p>Exploring the foundations of network monitoring and packet analysis</p>
+      </header>
+      <nav id="nav">
+        <ul>
+          <li><a href="../index.html" class="active">Home</a></li>
+          <li><a href="#two">Network Basics</a></li>
+          <li><a href="#three">libpcap Library</a></li>
+          <li><a href="#four">Packet Parsing</a></li>
+          <li><a href="#five">Implementation</a></li>
+          <li><a href="#six">Conclusion</a></li>
+        </ul>
+      </nav>
+      <footer>
+        <ul class="icons">
+          <li>
+            <a
+              href="https://github.com/aidanvidal"
+              class="icon brands fa-github"
+              target="_blank"
+              ><span class="label">Github</span></a
+            >
+          </li>
+        </ul>
+      </footer>
+    </section>
+    <div id="wrapper">
+      <main class="main">
+        <article class="blog-post">
+          <div class="container">
+            <section id="one">
+              <h2>Building a Packet Sniffer from Scratch with libpcap</h2>
+              <p>
+                When we think about network monitoring tools like Wireshark or
+                tcpdump, it's easy to forget that at their core, these tools are
+                simply capturing raw packets moving across the network and
+                decoding them. To better understand how data flows through
+                computer networks, I built a basic packet sniffer in C using the
+                libpcap library.
+              </p>
+              <p>
+                This post covers the foundational concepts of computer networks
+                relevant to packet sniffing, a breakdown of the key network
+                layers we parse (Ethernet, IP, TCP/UDP), and a walkthrough of my
+                C program that captures and analyzes packets in real-time.
+              </p>
+            </section>
+            <hr />
+            <section id="two">
+              <h4>Understanding the Basics of Computer Networks</h4>
+              <p>
+                Before diving into the code, it's important to understand what a
+                "packet" is. In computer networks, all communication happens in
+                chunks of data called packets. A packet typically passes through
+                multiple layers of the TCP/IP model:
+              </p>
+              <div class="technical-details">
+                <ol>
+                  <li>
+                    <strong>Link Layer (Ethernet)</strong> – Handles physical
+                    addressing (MAC addresses).
+                  </li>
+                  <li>
+                    <strong>Network Layer (IP)</strong> – Handles logical
+                    addressing and routing.
+                  </li>
+                  <li>
+                    <strong>Transport Layer (TCP/UDP)</strong> – Manages ports
+                    and ensures reliable or fast delivery.
+                  </li>
+                  <li>
+                    <strong>Application Layer (HTTP, DNS, etc.)</strong> – The
+                    human-facing protocols on top of TCP/UDP.
+                  </li>
+                </ol>
+              </div>
+              <p>
+                When a packet travels across a network interface, it carries a
+                stack of headers:
+              </p>
+              <ul>
+                <li>
+                  <strong>Ethernet header:</strong> Contains source and
+                  destination MAC addresses.
+                </li>
+                <li>
+                  <strong>IP header:</strong> Contains source and destination IP
+                  addresses, protocol type, TTL, etc.
+                </li>
+                <li>
+                  <strong>Transport header (TCP or UDP):</strong> Contains
+                  source/destination ports and flags.
+                </li>
+                <li>
+                  <strong>Payload:</strong> The actual data being transmitted.
+                </li>
+              </ul>
+              <p>
+                A packet sniffer listens to a network interface, captures these
+                packets, and allows us to inspect these headers.
+              </p>
+            </section>
+            <hr />
+            <section id="three">
+              <h4>Using libpcap for Packet Capture</h4>
+              <p>
+                libpcap is a widely used packet capture library that powers
+                tools like tcpdump and Wireshark. It allows applications to:
+              </p>
+              <div class="technical-details">
+                <ul>
+                  <li>Select a network device.</li>
+                  <li>
+                    Put it in promiscuous mode (capture all packets, not just
+                    those addressed to us).
+                  </li>
+                  <li>
+                    Filter packets (e.g., only TCP or a specific port).
+                  </li>
+                  <li>Access raw packet bytes for analysis.</li>
+                </ul>
+              </div>
+              <p>The workflow for our sniffer is:</p>
+              <ol>
+                <li>
+                  <strong>Select a network device:</strong> Either specified by
+                  the user or auto-detected.
+                </li>
+                <li>
+                  <strong>Open the device:</strong> Using
+                  <code>pcap_create()</code> and configure capture options.
+                </li>
+                <li>
+                  <strong>Apply a filter:</strong> Using Berkeley Packet Filters
+                  (BPF) to narrow down traffic.
+                </li>
+                <li>
+                  <strong>Capture packets:</strong> Using
+                  <code>pcap_loop()</code> and a callback function.
+                </li>
+                <li>
+                  <strong>Parse each packet:</strong> Decoding Ethernet, IP,
+                  TCP, and UDP headers.
+                </li>
+              </ol>
+            </section>
+            <hr />
+            <section id="four">
+              <h4>Parsing Packets</h4>
+              <p>
+                Each packet starts with an Ethernet header (14 bytes), followed
+                by an IP header (usually 20 bytes, but can vary), and optionally
+                a TCP or UDP header. We read these headers by casting portions
+                of the raw packet data into C structs defined for each layer.
+              </p>
+              <div class="technical-details">
+                <h5>Ethernet Header Structure</h5>
+                <pre><code class="language-c">struct sniff_ethernet {
+    u_char ether_dhost[6]; // Destination MAC
+    u_char ether_shost[6]; // Source MAC
+    u_short ether_type;    // Type (e.g., 0x0800 = IPv4)
+};</code></pre>
+              </div>
+              <p>
+                The IP header provides information about the packet version,
+                total length, source and destination IP addresses, and the
+                protocol (6 = TCP, 17 = UDP).
+              </p>
+              <p>
+                Finally, we look deeper into transport headers (TCP or UDP) to
+                extract port numbers and other details like flags in TCP.
+              </p>
+            </section>
+            <hr />
+            <section id="five">
+              <h4>The Packet Sniffer Implementation</h4>
+              <p>The core idea of the program follows this structure:</p>
+              <div class="technical-details">
+                <p>
+                  <strong>Device selection:</strong> We either specify the
+                  network device as a command-line argument or list available
+                  devices for the user to choose.
+                </p>
+                <p><strong>Packet capturing:</strong></p>
+                <pre><code class="language-c">pcap_loop(handle, 3, got_packet, NULL);</code></pre>
+                <p>
+                  This listens for 3 packets and calls <code>got_packet()</code>
+                  for each one.
+                </p>
+              </div>
+              <p>
+                <strong>Parsing:</strong> Inside <code>got_packet()</code>, we:
+              </p>
+              <ol>
+                <li>Extract Ethernet, IP, and TCP/UDP headers.</li>
+                <li>
+                  Print MAC addresses, IP addresses, protocol type, and port
+                  numbers.
+                </li>
+                <li>Dump raw packet data in hex for inspection.</li>
+              </ol>
+              <div class="technical-details">
+                <h5>Sample Output</h5>
+                <pre><code>Packet #1: length=98
+Source MAC: 90:09:d0:07:fe:44 -> a6:1e:a0:fb:63:33
+Source IP: 192.168.0.97 -> Destination IP: 104.18.94.41
+Protocol: TCP (6), TTL: 64
+TCP Source Port: 55427 -> Destination Port: 443</code></pre>
+                <p>
+                  This mimics a simplified tcpdump output but gives us full
+                  control over parsing and analyzing each header.
+                </p>
+              </div>
+            </section>
+            <hr />
+            <section id="six">
+              <h4>What I Learned</h4>
+              <ul>
+                <li>
+                  <strong>Promiscuous mode</strong> lets you see all traffic on
+                  your network, not just traffic to your machine.
+                </li>
+                <li>
+                  <strong>Packet structure matters:</strong> Offsets (Ethernet
+                  14 bytes, IP header length variable) are key to correct
+                  parsing.
+                </li>
+                <li>
+                  <strong>Filters are powerful:</strong> Using BPF, we can
+                  capture only the traffic we're interested in (like TCP port 80
+                  for HTTP).
+                </li>
+                <li>
+                  <strong>Low-level networking is hands-on:</strong> Unlike
+                  using curl or high-level APIs, working directly with packets
+                  teaches you what's really happening under the hood.
+                </li>
+              </ul>
+              <h5>Next Steps</h5>
+              <p>
+                The current sniffer works, but there's plenty of room for
+                improvement:
+              </p>
+              <ul>
+                <li>
+                  Implementing reassembly of TCP streams to see complete
+                  messages.
+                </li>
+                <li>Parsing higher-level protocols like HTTP or DNS.</li>
+                <li>Adding a real-time GUI for visualization.</li>
+                <li>Supporting IPv6 packets.</li>
+              </ul>
+            </section>
+            <hr />
+            <section id="seven">
+              <h4>Takeaway</h4>
+              <p>
+                Building a packet sniffer from scratch is a great way to
+                demystify networking. It bridges the gap between abstract
+                network theory and real data flowing through your machine. By
+                directly capturing and decoding packets, you gain a much deeper
+                appreciation of how computers communicate.
+              </p>
+              <p>
+                This project reinforced my understanding of network protocols
+                and gave me hands-on experience with low-level system
+                programming. The ability to see raw network traffic in real-time
+                provides invaluable insight into how modern network applications
+                actually work under the hood.
+              </p>
+              <p>
+                Thank you for reading! If you're interested in the code, you can find it
+                on my <a href="https://github.com/aidanvidal/CLI-Packet-Sniffer" target="_blank">GitHub</a>.
+              </p>
+            </section>
+            <hr />
+            <section id="eight">
+              <h4>Posted by: Aidan Vidal</h4>
+              <p>Posted on: August 5, 2025</p>
+            </section>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script src="../prism.js"></script>
+  </body>
+</html>
