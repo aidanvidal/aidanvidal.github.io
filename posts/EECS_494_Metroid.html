@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>EECS 494 Metroid Project</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="../images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackeling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="../index.html" class="active">Home</a></li>
+                <li><a href="#two">Project Overview</a></li>
+                <li><a href="#three">My Contributions</a></li>
+                <li><a href="#four">Challenges Along the Way</a></li>
+                <li><a href="#five">Play the Game</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>EECS 494: Metroid Project</h2>
+                <p>This was a project for a class at the University of Michigan (EECS 494). In this post, I’ll walk through my contributions to the game and the challenges my group faced along the way.</p>
+                </section>
+                <hr />
+                <!-- Two -->
+                <section id="two">
+                <h4>Project Overview</h4>
+                <p>In the EECS 494 class at the University of Michigan, the first big project is re-creating part of a NES game. My group and I chose to re-create the first bit of Metroid.</p>
+                <p>This post walks through my contributions and the challenges we faced as a group, including coordinating our work, integrating features, and refining the game through testing.</p>
+                <p>This game was made in Unity using C#</p>
+                </section>
+                <hr />
+                <!-- Three -->
+                <section id="three">
+                <h4>My Contributions</h4>
+                <ul>
+                    <li>
+                        <strong>Camera</strong>
+                        <p>Implemented a camera system that followed the player smoothly as they moved through the level, keeping the action centered while still ensuring the camera stays within the room bounds.</p>
+                    </li>
+                    <li>
+                        <strong>Room Transitions</strong>
+                        <p>Built the room transition logic so that changing room felt like the original. I used coroutines to manage timing and transitions cleanly, ensuring the player could move between spaces without abrupt scene changes.</p>
+                    </li>
+                    <li>
+                        <strong>Player Movement</strong>
+                        <p>Helped shape the player movement. This was important for making the character feel accurate and comfortable to control in a Metroid-style platformer.</p>
+                    </li>
+                    <li>
+                        <strong>Missile Weapon</strong>
+                        <p>Created and integrated the missile weapon and power-up. The feature included handling firing input, projectile behavior, and how the missle doors and power-up.</p>
+                    </li>
+                    <li>
+                        <strong>Enemy/Player Damage and Health</strong>
+                        <p>Implemented combat effects for both enemies and the player, including health damage and knockback reactions and I-frames. Coroutines helped manage timed invulnerability and hit response so damage feedback felt the original.</p>
+                    </li>
+                </ul>
+                </section>
+                <hr />
+                <!-- Four -->
+                <section id="four">
+                <h4>Challenges Along the Way</h4>
+                <p>One challenge was making independently developed pieces work together. Integrating features revealed mismatches and bugs that were difficult to spot when working in isolation, so testing the combined game and communicating clearly became essential.</p>
+                <p>We also had to balance our ideas with the time available for the class project. When something did not work as expected, we worked together to diagnose the issue, adjust our approach, and prioritize the parts that mattered most.</p>
+                </section>
+                <hr />
+                <!-- Five -->
+                <section id="five">
+                <h4>Play the Game</h4>
+                <p>You can play our final product <a href="https://lapantos.itch.io/metroid-nes-eecs-494">HERE!</a></p>
+                <hr />
+                <!-- Six -->
+                <section id="six">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: September 29, 2026</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+        
+    </div>
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/jquery.scrollex.min.js"></script>
+    <script src="../assets/js/jquery.scrolly.min.js"></script>
+    <script src="../assets/js/browser.min.js"></script>
+    <script src="../assets/js/breakpoints.min.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../prism.js"></script>
+</body>
+</html>
