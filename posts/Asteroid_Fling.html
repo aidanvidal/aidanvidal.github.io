@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Asteroid Fling - Project Post</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body class="is-preload">
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <span class="image avatar"><img src="../images/avatar.jpg" alt="" /></span>
+            <h1 id="logo">Aidan Vidal</h1>
+            <p>A passionate developer with a love for coding and problem-solving. 
+                I enjoy creating things that use AI as well as tackling smaller projects that pique my interest.
+            </p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="../index.html" class="active">Home</a></li>
+                <li><a href="#two">Project Overview</a></li>
+                <li><a href="#three">Key Mechanics & Systems</a></li>
+                <li><a href="#four">Development Iterations & Challenges</a></li>
+                <li><a href="#five">Play the Game</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="https://github.com/aidanvidal" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+    <!-- Blog Post Template -->
+    <div id="wrapper">
+        <main class="main">
+            <article class="blog-post">
+            <div class="container"> 
+                <!-- One -->
+                <section id="one">
+                <h2>Asteroid Fling</h2>
+                <p>A fast-paced, 2D arcade space platformer built around zero-gravity momentum, orbital physics, and precision slingshot mechanics.</p>
+                </section>
+                <hr />
+
+                <!-- Two -->
+                <section id="two">
+                <h4>Project Overview</h4>
+                <p><strong>Asteroid Fling</strong> is a minimalist 2D arcade game built in Unity using C#. The core objective is simple: navigate zero-gravity planetary obstacle courses, avoid hazardous out-of-bounds boundaries, and reach the exit portal as quickly as possible.</p>
+                <p>Instead of traditional platforming controls like running or jumping, movement in <em>Asteroid Fling</em> relies entirely on gravitational forces and momentum. Players interact with the environment using a single primary input—<strong>Left Click to Grapple</strong>—attaching to nearby celestial "Pull Stars" to whip around them in orbit and catapult across space.</p>
+                </section>
+                <hr />
+
+                <!-- Three -->
+                <section id="three">
+                <h4>Key Mechanics & Systems</h4>
+                <ul>
+                    <li>
+                        <strong>One-Button Grapple Controls</strong>
+                        <p>Left-clicking hooks onto the nearest Pull Star within range. The grapple automatically calculates radial spring forces and centripetal acceleration to lock the player into a stable orbit, granting an instantaneous velocity boost upon release.</p>
+                    </li>
+                    <li>
+                        <strong>Gravitational Swirl Fields</strong>
+                        <p>Planets act as circular vortex force fields. Applying a combination of continuous tangential (sideways) acceleration and radial (inward) attraction, planets dynamically sweep nearby objects—including stationary players, hazard debris, and pull stars—into rotational orbits.</p>
+                    </li>
+                    <li>
+                        <strong>Fatal Viewport Boundaries</strong>
+                        <p>To maintain high arcade stakes, camera boundaries are strictly enforced. Exiting the static camera view instantly triggers player death, complete with screen-shake feedback, spatialized sound effects, and level reloading.</p>
+                    </li>
+                    <li>
+                        <strong>Event-Driven Architecture & Audio Juice</strong>
+                        <p>Built on a decoupled Pub/Sub <code>EventBus</code> architecture. A persistent singleton <code>AudioManager</code> listens for gameplay events to trigger randomized grapple pitch effects, seamless cross-scene background music, and dynamic looping orbital sound effects.</p>
+                    </li>
+                </ul>
+                </section>
+                <hr />
+
+                <!-- Four -->
+                <section id="four">
+                <h4>Development Iterations & Challenges</h4>
+                <p>Designing a game reliant almost entirely on physics required constant iteration, mathematical fine-tuning, and playtesting feedback:</p>
+                
+                <p><strong>1. Redesigning Planet Gravity</strong><br />
+                Early versions of planet gravity relied on manually rotating velocity vectors. However, if a player came to a complete stop next to a planet, nothing happened because zero velocity rotated into zero velocity. I reworked planets to apply continuous physics forces (<code>Rigidbody2D.AddForce</code> with <code>ForceMode2D.Acceleration</code>), combining tangential swirl vectors with centripetal inward pull. This allowed stationary objects to automatically get swept up into orbit while ensuring objects of any mass orbited at uniform speeds.</p>
+
+                <p><strong>2. Balancing Newtonian Inertia vs. Player Control</strong><br />
+                I initially tried to lean into more physically accurate zero-gravity behavior, but playtesting quickly showed that strict Newtonian motion was not actually fun. Without damping or intentional control limits, players could build up absurd speeds across repeated grapple chains, making the game feel chaotic and less readable than it should. Instead of forcing realism, I tuned the movement toward an arcade-friendly compromise: the level still feels floaty and spacey, but with soft speed capping, radial spring-dampers, and more deliberate momentum control so each slingshot remains readable, skillful, and satisfying to play.</p>
+
+                <p><strong>3. Enforcing Multi-Resolution Aspect Ratios</strong><br />
+                Because level layout and fatal boundaries depend on camera viewports, testing across different monitor resolutions initially broke game balance. Standard Canvas UI elements also leaked over letterbox regions during scene reloads. I resolved this by building a custom viewport script with a dedicated background depth-camera to lock the viewport to a strict 16:9 aspect ratio across all screen resolutions without UI visual artifacts.</p>
+
+                <p><strong>4. Audio State Management across Scene Reloads</strong><br />
+                Handling looping sound effects (like the planet orbital hum) created edge-case bugs where sounds continued playing post-death because scene reloads bypassed standard trigger-exit events. Subscribing audio counters directly to Unity's <code>SceneManager.sceneLoaded</code> callbacks guaranteed all physics state flags clean up cleanly on restarts.</p>
+                </section>
+                <hr />
+
+                <!-- Five -->
+                <section id="five">
+                <h4>Play the Game</h4>
+                <p>Experience the momentum-based slingshot mechanics of <strong>Asteroid Fling</strong> yourself!</p>
+                <p><a href="https://lapantos.itch.io/asteroid-fling" target="_blank" class="button primary">Play Asteroid Fling Here</a></p>
+                </section>
+                <hr />
+
+                <!-- Six -->
+                <section id="six">
+                    <h4>Posted by: Aidan Vidal</h4>
+                    <p>Posted on: October 18, 2026</p>
+                </section>
+            </div>
+            </article>
+        </main>
+
+        <section id="footer">
+            <div class="container">
+                <ul class="copyright">
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/jquery.scrollex.min.js"></script>
+    <script src="../assets/js/jquery.scrolly.min.js"></script>
+    <script src="../assets/js/browser.min.js"></script>
+    <script src="../assets/js/breakpoints.min.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../prism.js"></script>
+</body>
+</html>
